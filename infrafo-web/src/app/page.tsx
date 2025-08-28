@@ -1,4 +1,5 @@
 import Image from "next/image";
+import Square from "@/testing/square";
 
 export default function Home() {
   return (
@@ -98,6 +99,10 @@ export default function Home() {
           Go to nextjs.org →
         </a>
       </footer>
+      <div>
+        <Square />
+      </div>
+
     </div>
   );
 }
