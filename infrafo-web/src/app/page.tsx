@@ -1,5 +1,5 @@
 import Image from "next/image";
-import Square from "@/testing/square";
+import Board from "@/testing/board";
 
 export default function Home() {
   return (
@@ -100,7 +100,7 @@ export default function Home() {
         </a>
       </footer>
       <div>
-        <Square />
+        <Board />
       </div>
 
     </div>
