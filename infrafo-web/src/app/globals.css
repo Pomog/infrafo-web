@@ -37,6 +37,7 @@ body {
   margin-top: -1px;
   padding: 0;
   text-align: center;
+  color: black;
   width: 34px;
 }
 
@@ -44,4 +45,9 @@ body {
   clear: both;
   content: '';
   display: table;
+}
+
+.status {
+  margin-bottom: 10px;
+  text-align: center;
 }

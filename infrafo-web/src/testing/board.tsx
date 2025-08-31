@@ -7,14 +7,9 @@ export default function Board() {
     type Cell = 'X' | 'O' | null;
 
     const LINES = [
-        [0, 1, 2], // row
-        [3, 4, 5],
-        [6, 7, 8],
-        [0, 3, 6], // columns
-        [1, 4, 7],
-        [2, 5, 8],
-        [0, 4, 8], // diagonal
-        [2, 4, 6],
+        [0,1,2], [3,4,5], [6,7,8], // row
+        [0,3,6], [1,4,7], [2,5,8], // columns
+        [0,4,8], [2,4,6],   // diagonal
     ] as const satisfies ReadonlyArray<readonly [number, number, number]>;
 
     const emptyBoard = useCallback(() => Array(9).fill(null), []);
@@ -22,8 +17,21 @@ export default function Board() {
 
     const [xIsNext, setXIsNext] = useState<boolean>(true);
 
+    const winner = calculateWinner(squares);
+    const isDraw = !winner && !squares.includes(null);
+    const gameStatus = winner
+        ? `Winner: ${winner}`
+        : isDraw
+            ? 'Draw'
+            : `Next player: ${xIsNext ? 'X' : 'O'}`;
+
+    const reset = () => {
+        setSquares(Array<Cell>(9).fill(null));
+        setXIsNext(true);
+    };
+
     function handleClick(i) {
-        if (squares[i] || calculateWinner(squares)) return;
+        if (squares[i] || winner || isDraw) return;
 
         setSquares(prev => {
             const next = prev.slice();
@@ -39,11 +47,12 @@ export default function Board() {
             const v = squares[a];
             if (v && v === squares[b] && v === squares[c]) return v;
         }
-        return null;
+        return null; // O(1)
     }
 
     return (
         <>
+            <div className="status">{gameStatus}</div>
             <div className="board-row">
                 <Square value={squares[0]} onSquareClick={() => handleClick(0)} />
                 <Square value={squares[1]} onSquareClick={() => handleClick(1)} />
