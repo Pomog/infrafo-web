@@ -10,18 +10,37 @@ export default function Game() {
     const [history, setHistory] = useState<ReadonlyArray<ReadonlyArray<Cell>>>([
         emptyBoard(),
     ]);
-    const [xIsNext, setXIsNext] = useState<boolean>(true);
-
-    const currentSquares = history[history.length - 1];
+    const [currentMove, setCurrentMove] = useState(0);
+    const xIsNext = currentMove % 2 === 0;
+    const currentSquares = history[currentMove];
 
     function handlePlay(nextSquares) {
-        setHistory(prev => [...prev, nextSquares]);
-        setXIsNext(prev => !prev);
+        const nextHistory = [...history.slice(0, currentMove + 1), nextSquares];
+        setHistory(nextHistory);
+        setCurrentMove(nextHistory.length - 1);
     }
+
+    function jumpTo(nextMove) {
+        setCurrentMove(nextMove);
+    }
+
+    const moves = history.map((squares, move) => {
+        let description;
+        if (move > 0) {
+            description = 'Go to move #' + move;
+        } else {
+            description = 'Go to game start';
+        }
+        return (
+            <li key={move}>
+                <button onClick={() => jumpTo(move)}>{description}</button>
+            </li>
+        );
+    });
 
     const reset = () => {
         setHistory([emptyBoard()]);
-        setXIsNext(true);
+        setCurrentMove(0);
     };
 
     return (
@@ -34,7 +53,7 @@ export default function Game() {
                     reset={reset} />
             </div>
             <div className="game-info">
-                <ol>{/*TODO*/}</ol>
+                <ol>{moves}</ol>
             </div>
         </div>
     );

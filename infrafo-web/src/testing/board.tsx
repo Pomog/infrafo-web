@@ -32,6 +32,7 @@ export default function Board({ xIsNext, squares, onPlay, reset }: BoardProps) {
 
     return (
         <>
+            // TODO: Rewrite Board to use two loops to make the squares instead of hardcoding them.
             <div className="status">{gameStatus}</div>
             <div className="board-row">
                 <Square value={squares[0]} onSquareClick={() => handleClick(0)}/>
