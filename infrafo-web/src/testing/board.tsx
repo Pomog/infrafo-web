@@ -1,45 +1,25 @@
 "use client";
 
 import Square from "@/testing/square";
-import {useCallback, useState} from "react";
+import {BoardProps, Cell, LINES} from "@/testing/types";
 
-export default function Board() {
-    type Cell = 'X' | 'O' | null;
-
-    const LINES = [
-        [0, 1, 2], [3, 4, 5], [6, 7, 8], // row
-        [0, 3, 6], [1, 4, 7], [2, 5, 8], // columns
-        [0, 4, 8], [2, 4, 6],   // diagonal
-    ] as const satisfies ReadonlyArray<readonly [number, number, number]>;
-
-    const emptyBoard = useCallback(() => Array(9).fill(null), []);
-    const [squares, setSquares] = useState<Cell[]>(emptyBoard);
-
-    const [xIsNext, setXIsNext] = useState<boolean>(true);
+export default function Board({ xIsNext, squares, onPlay, reset }: BoardProps) {
 
     const winner = calculateWinner(squares);
     const isDraw = !winner && !squares.includes(null);
+    const nexMove = xIsNext ? 'X' : 'O';
     const gameStatus = winner
         ? `Winner: ${winner}`
         : isDraw
             ? 'Draw'
-            : `Next player: ${xIsNext ? 'X' : 'O'}`;
-
-    const reset = () => {
-        setSquares(Array<Cell>(9).fill(null));
-        setXIsNext(true);
-    };
+            : `Next player: ${nexMove}`;
 
     function handleClick(i) {
         if (squares[i] || winner || isDraw) return;
 
-        setSquares(prev => {
-            const next = prev.slice();
-            next[i] = xIsNext ? 'X' : 'O';
-            return next;
-        });
-
-        setXIsNext(prev => !prev);
+        const nextSquares = squares.slice();
+        nextSquares[i] = nexMove;
+        onPlay(nextSquares);
     }
 
     function calculateWinner(squares: readonly Cell[]): 'X' | 'O' | null {

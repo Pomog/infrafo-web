@@ -1,5 +1,5 @@
 import Image from "next/image";
-import Board from "@/testing/board";
+import Game from "@/testing/game";
 
 export default function Home() {
   return (
@@ -100,7 +100,7 @@ export default function Home() {
         </a>
       </footer>
       <div>
-        <Board />
+        <Game />
       </div>
 
     </div>
