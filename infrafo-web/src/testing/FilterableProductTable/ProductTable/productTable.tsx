@@ -1,11 +1,13 @@
 import {type Product} from "@/testing/FilterableProductTable/ProductTable/tableDataTypes";
 import ProductCategoryRow from "@/testing/FilterableProductTable/ProductTable/productCategoryRow";
 import ProductRow from "@/testing/FilterableProductTable/ProductTable/productRow";
+import {JSX} from "react";
 
 export default function ProductTable({ products }: { products: Product[] }){
-    const rows = [];
-    let lastCategory = null;
+    const rows: JSX.Element[] = [];
+    let lastCategory: string | null = null;
 
+    // products sorted
     products.forEach((product) => {
         if (product.category !== lastCategory) {
             rows.push(
