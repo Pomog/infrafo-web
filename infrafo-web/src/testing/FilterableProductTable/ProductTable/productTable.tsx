@@ -1,4 +1,4 @@
-import {Product} from "@/testing/FilterableProductTable/ProductTable/tableDataTypes";
+import {type Product} from "@/testing/FilterableProductTable/ProductTable/tableDataTypes";
 import ProductCategoryRow from "@/testing/FilterableProductTable/ProductTable/productCategoryRow";
 import ProductRow from "@/testing/FilterableProductTable/ProductTable/productRow";
 
