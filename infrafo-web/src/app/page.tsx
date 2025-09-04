@@ -1,5 +1,7 @@
 import Image from "next/image";
 import Game from "@/testing/game";
+import FilterableProductTable from "@/testing/FilterableProductTable/filterableProductTable";
+import {PRODUCTS} from "@/testing/FilterableProductTable/ProductTable/tableDataTypes";
 
 export default function Home() {
   return (
@@ -101,6 +103,9 @@ export default function Home() {
       </footer>
       <div>
         <Game />
+      </div>
+      <div>
+        <FilterableProductTable products={PRODUCTS} />
       </div>
 
     </div>
