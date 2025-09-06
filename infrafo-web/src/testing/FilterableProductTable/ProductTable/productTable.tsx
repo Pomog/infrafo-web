@@ -3,12 +3,28 @@ import ProductCategoryRow from "@/testing/FilterableProductTable/ProductTable/pr
 import ProductRow from "@/testing/FilterableProductTable/ProductTable/productRow";
 import {JSX} from "react";
 
-export default function ProductTable({ products }: { products: Product[] }){
+export default function ProductTable({
+                                         products,
+                                         filterText,
+                                         inStockOnly
+                                     }: {
+    products: Product[],
+    filterText: string,
+    inStockONly: boolean,
+}) {
     const rows: JSX.Element[] = [];
     let lastCategory: string | null = null;
 
     // products sorted
     products.forEach((product) => {
+        if (
+            product.name.toLowerCase().indexOf(
+                filterText.toLowerCase()
+            ) === -1
+        ) {
+            return;
+        }
+        
         if (product.category !== lastCategory) {
             rows.push(
                 <ProductCategoryRow
