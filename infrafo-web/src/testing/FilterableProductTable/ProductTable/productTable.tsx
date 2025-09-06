@@ -10,13 +10,16 @@ export default function ProductTable({
                                      }: {
     products: Product[],
     filterText: string,
-    inStockONly: boolean,
+    inStockOnly: boolean,
 }) {
     const rows: JSX.Element[] = [];
     let lastCategory: string | null = null;
 
     // products sorted
     products.forEach((product) => {
+        if (inStockOnly && !product.stocked) {
+            return;
+        }
         if (
             product.name.toLowerCase().indexOf(
                 filterText.toLowerCase()
@@ -24,7 +27,7 @@ export default function ProductTable({
         ) {
             return;
         }
-        
+
         if (product.category !== lastCategory) {
             rows.push(
                 <ProductCategoryRow

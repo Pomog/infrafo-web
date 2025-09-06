@@ -13,3 +13,10 @@ export const PRODUCTS = [
     {category: "Vegetables", price: "$4", stocked: false, name: "Pumpkin"},
     {category: "Vegetables", price: "$1", stocked: true, name: "Peas"}
 ];
+
+export type SearchBarProps = {
+    filterText: string;
+    inStockOnly: boolean;
+    onFilterTextChange: (value: string) => void;
+    onInStockOnlyChange: (value: boolean) => void;
+};
