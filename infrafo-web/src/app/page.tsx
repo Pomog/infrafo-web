@@ -2,6 +2,7 @@ import Image from "next/image";
 import Game from "@/testing/game";
 import FilterableProductTable from "@/testing/FilterableProductTable/filterableProductTable";
 import {PRODUCTS} from "@/testing/FilterableProductTable/ProductTable/tableDataTypes";
+import TestAnim from "@/testing/Anim/testAnim";
 
 export default function Home() {
     return (
@@ -109,6 +110,10 @@ export default function Home() {
 
             <div>
                 <FilterableProductTable products={PRODUCTS}/>
+            </div>
+
+            <div>
+                <TestAnim />
             </div>
 
         </div>
