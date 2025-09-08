@@ -1,24 +1,25 @@
 "use client";
 import React, {useEffect, useRef} from 'react';
 
-const TestAnim = () => {
+const TestAnim: React.FC<{}> = () => {
     const dotRef = useRef<HTMLDivElement | null>(null);
+
     useEffect(() => {
         let x = 0;
         const speed = 50;
         let prev = performance.now();
-        let rafId;
+        let rafId: number;
 
-        const tick = (t) => {
+        const tick = (t: number) => {
+            const el = dotRef.current;
+            if (!el) return;
+
             const dt = (t - prev) / 1000;
             prev = t;
 
             x = (x + speed * dt) % 300;
-            if (dotRef.current) {
-                if ("style" in dotRef.current) {
-                    dotRef.current.style.transform = `translate3d(${x}px,0,0)`;
-                }
-            }
+            el.style.transform = `translate3d(${x}px,0,0)`;
+
             rafId = requestAnimationFrame(tick);
         };
 
