@@ -5,8 +5,10 @@ const TestAnim: React.FC<{}> = () => {
     const dotRef = useRef<HTMLDivElement | null>(null);
 
     useEffect(() => {
-        let x = 0;
+        let x : number = 0;
         const speed = 50;
+        const STEP = 1/60;
+        let acc = 0;
         let prev = performance.now();
         let rafId: number;
 
@@ -17,7 +19,13 @@ const TestAnim: React.FC<{}> = () => {
             const dt = (t - prev) / 1000;
             prev = t;
 
-            x = (x + speed * dt) % 300;
+            acc += Math.min(dt, 0.25);
+
+            while (acc >= STEP) {
+                x = (x + speed * STEP) % 300;
+                acc -= STEP;
+            }
+
             el.style.transform = `translate3d(${x}px,0,0)`;
 
             rafId = requestAnimationFrame(tick);
@@ -28,7 +36,14 @@ const TestAnim: React.FC<{}> = () => {
     }, []);
 
     return (
-        <div style={{width: 340, height: 80, background: '#0b1324', padding: 20, borderRadius: 12}}>
+        <div style={{
+            width: 340,
+            height: 80,
+            background: '#0b1324',
+            padding: 20,
+            borderRadius: 12,
+            perspective: '500px',
+        }}>
             <div
                 ref={dotRef}
                 style={{
