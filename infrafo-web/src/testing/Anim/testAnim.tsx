@@ -7,6 +7,10 @@ const SPEED = 120;
 const DT_MAX = 0.05;
 const STEP = 1 / 60
 
+const CONTAINER_H = DOT * 3;
+const START_X = TRACK / 2;
+const START_Y = (CONTAINER_H - DOT) / 2;
+
 const TestAnim: React.FC<{}> = () => {
     const dotRef = useRef<HTMLDivElement | null>(null);
 
@@ -16,7 +20,7 @@ const TestAnim: React.FC<{}> = () => {
     const prevRef = useRef<number | undefined>(undefined);
 
     useEffect(() => {
-        let x: number = 0;
+        let x: number = START_X;
         let acc = 0;
 
         const tick = (t: number) => {
@@ -44,7 +48,7 @@ const TestAnim: React.FC<{}> = () => {
                 acc -= STEP;
             }
 
-            el.style.transform = `translate3d(${x}px,0,0)`;
+            el.style.transform = `translate3d(${x}px,${START_Y}px,0)`;
 
             if (runRef.current) {
                 rafId.current = requestAnimationFrame(tick);
@@ -53,15 +57,18 @@ const TestAnim: React.FC<{}> = () => {
 
         rafId.current = requestAnimationFrame(tick);
 
+        const stopRaf = () => {
+            const id = rafId.current;
+            if (id !== null) {
+                cancelAnimationFrame(id);
+                rafId.current = null;
+            }
+        };
+
         const toggleRun = () => {
             if (runRef.current) {
                 runRef.current = false;
-                if (rafId.current != null) {
-                    if (typeof rafId.current === "number") {
-                        cancelAnimationFrame(rafId.current);
-                    }
-                    rafId.current = null;
-                }
+                stopRaf();
             } else {
                 runRef.current = true;
                 prevRef.current = undefined;
@@ -69,31 +76,36 @@ const TestAnim: React.FC<{}> = () => {
             }
         };
 
-        const onKey = (e: KeyboardEvent) => {
+        const onKey: EventListener = (e: KeyboardEvent) => {
             if (e.code === "Space") {
                 e.preventDefault();
                 toggleRun();
             }
         };
 
+        const onClick: EventListener = (e) => {
+            e.preventDefault?.();
+            toggleRun();
+        };
+
         const sceneEl = dotRef.current?.parentElement;
-        sceneEl?.addEventListener("click", toggleRun);
+        sceneEl?.addEventListener("click", onClick);
         window.addEventListener("keydown", onKey);
 
 
         return () => {
-            if (rafId.current) cancelAnimationFrame(rafId.current);
+            stopRaf();
             window.removeEventListener("keydown", onKey);
-            sceneEl?.removeEventListener("click", toggleRun);
+            sceneEl?.removeEventListener("click", onClick);
         }
     }, []);
 
     return (
         <div style={{
-            width: TRACK + DOT * 2,
-            height: 80,
+            width: TRACK + DOT,
+            height: DOT*3,
             background: '#0b1324',
-            padding: 20,
+            padding: 0,
             borderRadius: 12,
             perspective: '500px',
             userSelect: "none",
@@ -106,6 +118,7 @@ const TestAnim: React.FC<{}> = () => {
                 style={{
                     width: DOT, height: DOT, borderRadius: DOT / 2,
                     background: '#22d3ee', willChange: 'transform',
+                    transform: `translate3d(${START_X}px, ${START_Y}px, 0)`,
                 }}
             />
         </div>
