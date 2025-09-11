@@ -1,9 +1,9 @@
-import TestAnim from "@/testing/Anim/testAnim";
+import TestAnim2 from "@/testing/Anim/parametricAnimation";
 
 export default function Home() {
     return (
         <div>
-            <TestAnim/>
+            <TestAnim2/>
         </div>
     );
 };
