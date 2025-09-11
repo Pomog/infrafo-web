@@ -83,7 +83,7 @@ const TestAnim: React.FC<{}> = () => {
             }
         };
 
-        const onClick: EventListener = (e) => {
+        const onClick: EventListener = (e: MouseEvent) => {
             e.preventDefault?.();
             toggleRun();
         };
@@ -101,7 +101,8 @@ const TestAnim: React.FC<{}> = () => {
     }, []);
 
     return (
-        <div style={{
+        <div
+            style={{
             width: TRACK + DOT,
             height: DOT*3,
             background: '#0b1324',
