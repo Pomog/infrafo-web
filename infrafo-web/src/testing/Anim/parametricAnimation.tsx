@@ -12,7 +12,7 @@ const START_Y = (CONTAINER_H - DOT) / 2;
 
 const OMEGA_X = 1;
 const OMEGA_Y = 1;
-const SPEED_K = 1.0;
+const SPEED_K = 3;
 
 const TestAnim2: React.FC = () => {
     const dotRef = useRef<HTMLDivElement | null>(null);
