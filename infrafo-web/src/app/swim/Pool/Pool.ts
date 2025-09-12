@@ -1,4 +1,4 @@
-import {Point} from "@/app/swim/Pool/Actor";
+import {Point} from "@/app/swim/Pool/Types";
 
 
 export class Pool {

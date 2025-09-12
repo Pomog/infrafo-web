@@ -1,6 +1,6 @@
-export type Point = { x: number; y: number };
+import {CATCH_EPS, Delta, Point, StepResult, UnitVector} from "@/app/swim/Pool/Types";
 
-abstract class Actor {
+export abstract class Actor {
     protected pos: Point;
 
     protected constructor(
@@ -10,15 +10,32 @@ abstract class Actor {
         this.pos = {...startPoint};
     }
 
-    protected getDistance(opponent: Actor) {
-        const dx = this.pos.x - opponent.position.x;
-        const dy: number = this.pos.y - opponent.position.y;
-        return Math.hypot(dx, dy);
+    protected vecFrom(p: Point): Delta {
+        const dx = this.pos.x - p.x;
+        const dy = this.pos.y - p.y;
+        const len = Math.hypot(dx, dy);
+        return {dx, dy, len};
     }
 
-    abstract update(dt: number, opponent: Actor): void;
+    protected moveAlong(uVector: UnitVector, dt): void {
+        this.pos = {
+            x: this.pos.x + uVector.ux * this.speed * dt,
+            y: this.pos.y + uVector.uy * this.speed * dt,
+        };
+    }
+
+
+    protected unitFrom(p: Point): { uVector: UnitVector; len: number } | null {
+        const {dx, dy, len} = this.vecFrom(p);
+        if (len <= CATCH_EPS) return null;
+
+        const uVector: UnitVector = {ux: dx / len, uy: dy / len};
+        return {uVector, len}
+    }
+
+    abstract update(dt: number, opponent: Actor): StepResult;
 
     public get position(): Point {
-        return this.pos;
+        return {...this.pos};
     }
 }
