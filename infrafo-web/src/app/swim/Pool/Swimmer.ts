@@ -6,7 +6,7 @@ export class Swimmer extends Actor {
         super(speed, start);
     }
     update(dt: number, opponent: Actor): StepResult {
-        const dir = this.unitFrom(opponent.position);
+        const dir = this.directionFrom(opponent.position);
         if (!dir) return CAUGHT;
 
         this.moveAlong(dir.uVector, dt);

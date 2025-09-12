@@ -1,4 +1,4 @@
-import {CATCH_EPS, Delta, Point, StepResult, UnitVector} from "@/app/swim/Pool/Types";
+import {CATCH_EPS, Delta, Point, StepResult, UnitVector, UnitDirection} from "@/app/swim/Pool/Types";
 
 export abstract class Actor {
     protected pos: Point;
@@ -24,13 +24,12 @@ export abstract class Actor {
         };
     }
 
-
-    protected unitFrom(p: Point): { uVector: UnitVector; len: number } | null {
+    protected directionFrom(p: Point): UnitDirection | null {
         const {dx, dy, len} = this.vecFrom(p);
         if (len <= CATCH_EPS) return null;
 
-        const uVector: UnitVector = {ux: dx / len, uy: dy / len};
-        return {uVector, len}
+        const uVector: UnitVector = { ux: dx / len, uy: dy / len };
+        return { uVector, distance: len };
     }
 
     abstract update(dt: number, opponent: Actor): StepResult;
