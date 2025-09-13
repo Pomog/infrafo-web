@@ -1,6 +1,7 @@
 export type Point = { x: number; y: number };
 export type Delta = { dx: number; dy: number; len: number };
 export type UnitVector = { ux: number; uy: number };
+export type MyVector = { vx: number; vy: number };
 export type UnitDirection = { uVector: UnitVector; distance: number };
 
 export const CATCH_EPS = 1e-6 as const;
