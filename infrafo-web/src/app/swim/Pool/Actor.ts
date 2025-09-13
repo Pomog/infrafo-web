@@ -5,9 +5,9 @@ export abstract class Actor {
 
     protected constructor(
         protected readonly speed: number,
-        startPoint: Point
+        position: Point
     ) {
-        this.pos = {...startPoint};
+        this.pos = {...position};
     }
 
     protected vecFrom(p: Point): Delta {

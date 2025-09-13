@@ -9,7 +9,6 @@ export type StepResult =
     | { kind: "ok" }
     | { kind: "caught" };
 
-
 export const OK: StepResult = {kind: "ok"};
 
 export const CAUGHT: StepResult = {kind: "caught"};
