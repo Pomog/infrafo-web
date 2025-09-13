@@ -14,7 +14,6 @@ export class Coach extends Actor {
     }
 
     private chooseDirCCW(): -1 | 0 | 1 {
-        // radial unit vector
         const radialVector: UnitVector = {
             ux: this.pos.x - this.poolCenter.x,
             uy: this.pos.y - this.poolCenter.y,
