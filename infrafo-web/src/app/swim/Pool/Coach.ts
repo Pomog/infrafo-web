@@ -17,7 +17,7 @@ export class Coach extends Actor {
         if (dir === 0) return OK; // no move this frame
 
         // angular step: ΔA = (v*dt)/R, signed by dir
-        const dA = (dir * this.speed * dt) / this.poolRadius;
+        const dA = dir * (this.speed * dt) / this.poolRadius;
 
         // Current radial vector from center to Coach
         const radialVector: Delta = this.vecFrom(this.poolCenter);
