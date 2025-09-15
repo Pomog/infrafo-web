@@ -3,6 +3,7 @@ import Game from "@/testing/game";
 import FilterableProductTable from "@/testing/FilterableProductTable/filterableProductTable";
 import {PRODUCTS} from "@/testing/FilterableProductTable/ProductTable/tableDataTypes";
 import TestAnim from "@/testing/Anim/testAnim";
+import SwimAnim from "@/app/swim/Pool/Pool";
 
 export default function Home() {
     return (
@@ -113,7 +114,7 @@ export default function Home() {
             </div>
 
             <div>
-                <TestAnim />
+                <SwimAnim />
             </div>
 
 

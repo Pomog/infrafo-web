@@ -17,7 +17,7 @@ export abstract class Actor {
         return {dx, dy, len};
     }
 
-    protected moveAlong(uVector: UnitVector, dt): void {
+    protected moveAlong(uVector: UnitVector, dt: number): void {
         this.pos = {
             x: this.pos.x + uVector.ux * this.speed * dt,
             y: this.pos.y + uVector.uy * this.speed * dt,
@@ -30,6 +30,15 @@ export abstract class Actor {
 
         const uVector: UnitVector = { ux: dx / len, uy: dy / len };
         return { uVector, distance: len };
+    }
+
+    /** Distance from this actor to another actor. */
+    protected distanceToActor(other: Actor): number {
+        return this.vecFrom(other.position).len;
+    }
+
+    protected isCaught(other: Actor, eps: number = CATCH_EPS): boolean {
+        return this.distanceToActor(other) <= eps;
     }
 
     abstract update(dt: number, opponent: Actor): StepResult;
