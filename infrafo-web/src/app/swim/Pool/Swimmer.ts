@@ -32,7 +32,10 @@ export class Swimmer extends Actor {
         // time for swimmer to get to the rim
         const tSwimmer: number = distanceToRim  / this.speed;
 
-        // TODO: 0 division
+
+        if (centerToSwimmer.len < CATCH_EPS) {
+            // TODO: 0 division
+        }
         // closest point on the rim
         const cpr: Point = {
             x: this.poolCenter.x + centerToSwimmer.dx * this.poolRadius/Math.abs(centerToSwimmer.len),
@@ -52,6 +55,8 @@ export class Swimmer extends Actor {
 
         // coach angular speed
         const omega = this.speedOf(opponent) / this.poolRadius;
+
+        // TODO: calculated Swimmer angular speed in this point based on position and linear speed
 
         // time for coach to get to the swimmer's closest point on the rim. rad/s
         const tCoach = omega <= ANG_EPS ? Number.POSITIVE_INFINITY : dPhi / omega;
