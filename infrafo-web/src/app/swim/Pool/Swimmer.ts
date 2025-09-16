@@ -1,5 +1,5 @@
 import { Actor } from "@/app/swim/Pool/Actor";
-import {CATCH_EPS, CAUGHT, Delta, FLED, MyVector, OK, Point, StepResult} from "@/app/swim/Pool/Types";
+import {ANG_EPS, CATCH_EPS, CAUGHT, Delta, FLED, OK, Point, StepResult} from "@/app/swim/Pool/Types";
 
 export class Swimmer extends Actor {
     private readonly poolRadius: number;
@@ -20,25 +20,24 @@ export class Swimmer extends Actor {
         const dir = this.directionFrom(opponent.position);
         if (!dir) return CAUGHT;
 
-        // TODO: check dash mode if it is possible large curvature - flawed strategy
-
         // vector from center O to swimmer and distance
         const centerToSwimmer: Delta = this.vecFrom(this.poolCenter);
 
         // distance swimmer to the rim
         const distanceToRim : number = this.poolRadius - centerToSwimmer.len;
+        if( distanceToRim < CATCH_EPS) {
+            return FLED;
+        }
 
         // time for swimmer to get to the rim
         const tSwimmer: number = distanceToRim  / this.speed;
 
+        // TODO: 0 division
         // closest point on the rim
         const cpr: Point = {
             x: this.poolCenter.x + centerToSwimmer.dx * this.poolRadius/Math.abs(centerToSwimmer.len),
             y: this.poolCenter.y + centerToSwimmer.dy * this.poolRadius/Math.abs(centerToSwimmer.len),
         };
-
-        // time for coach to get to the swimmer's closest point on the rim. rad/s
-        const omega = this.speedOf(opponent) / this.poolRadius;
 
         const thetaS = centerToSwimmer.len === 0 ?
             0 : Math.atan2(centerToSwimmer.dy, centerToSwimmer.dx);
@@ -47,19 +46,34 @@ export class Swimmer extends Actor {
             opponent.position.x - this.poolCenter.x
         );
 
-        // min angle for the coach to get to the swimmer's closest point on the rim
+        // min angle for the coach to reach the swimmer's closest point on the rim
         let dPhi = ((thetaS - thetaC) % (2 * Math.PI) + 2 * Math.PI) % (2 * Math.PI);
         if (dPhi > Math.PI) dPhi = 2 * Math.PI - dPhi;
 
-        // time for coach to get to the rim
-        const tCoach = omega <= CATCH_EPS ? Number.POSITIVE_INFINITY : dPhi / omega;
+        // coach angular speed
+        const omega = this.speedOf(opponent) / this.poolRadius;
+
+        // time for coach to get to the swimmer's closest point on the rim. rad/s
+        const tCoach = omega <= ANG_EPS ? Number.POSITIVE_INFINITY : dPhi / omega;
 
         if (tSwimmer < tCoach) {
-            const nx = this.pos.x +
+            // ---- DASH
+            const step = this.speed * dt;
+            if (step >= distanceToRim) {
+                  this.pos = {
+                    x: cpr.x,
+                    y: cpr.y,
+                };
+                return FLED;
+            }
+
+            const invr = centerToSwimmer.len === 0 ? 0 : 1 / centerToSwimmer.len;
+            this.pos = {
+                x: this.pos.x + centerToSwimmer.dx * invr * step,
+                y: this.pos.y + centerToSwimmer.dy * invr * step,
+            };
+            return OK;
         }
-
-
-
 
         // candidate next position
         const nx = this.pos.x + dir.uVector.ux * this.speed * dt;

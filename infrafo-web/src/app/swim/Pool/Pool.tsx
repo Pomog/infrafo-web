@@ -14,7 +14,7 @@ const PAD = 24;  // padding around pool (px)
 const DOT = 14;  // dot size (px)
 
 const SWIMMER_SPEED = 20;
-const COACH_SPEED = 60;
+const COACH_SPEED = 80;
 
 export default function SwimAnim() {
     const swimmerRef = useRef<Swimmer | null>(null);

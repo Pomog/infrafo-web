@@ -5,6 +5,7 @@ export type MyVector = { vx: number; vy: number };
 export type UnitDirection = { uVector: UnitVector; distance: number };
 
 export const CATCH_EPS = 1e-1 as const;
+export const ANG_EPS = 1e-9 as const;
 
 export type StepResult =
     | { kind: "ok" }
