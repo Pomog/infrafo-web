@@ -17,6 +17,10 @@ export abstract class Actor {
         return {dx, dy, len};
     }
 
+    protected speedOf(other: Actor): number {
+        return other.speed;
+    }
+
     protected moveAlong(uVector: UnitVector, dt: number): void {
         this.pos = {
             x: this.pos.x + uVector.ux * this.speed * dt,

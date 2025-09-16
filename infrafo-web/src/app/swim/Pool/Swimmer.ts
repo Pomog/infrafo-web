@@ -1,5 +1,5 @@
 import { Actor } from "@/app/swim/Pool/Actor";
-import { CAUGHT, FLED, OK, Point, StepResult } from "@/app/swim/Pool/Types";
+import {CATCH_EPS, CAUGHT, Delta, FLED, MyVector, OK, Point, StepResult} from "@/app/swim/Pool/Types";
 
 export class Swimmer extends Actor {
     private readonly poolRadius: number;
@@ -21,6 +21,45 @@ export class Swimmer extends Actor {
         if (!dir) return CAUGHT;
 
         // TODO: check dash mode if it is possible large curvature - flawed strategy
+
+        // vector from center O to swimmer and distance
+        const centerToSwimmer: Delta = this.vecFrom(this.poolCenter);
+
+        // distance swimmer to the rim
+        const distanceToRim : number = this.poolRadius - centerToSwimmer.len;
+
+        // time for swimmer to get to the rim
+        const tSwimmer: number = distanceToRim  / this.speed;
+
+        // closest point on the rim
+        const cpr: Point = {
+            x: this.poolCenter.x + centerToSwimmer.dx * this.poolRadius/Math.abs(centerToSwimmer.len),
+            y: this.poolCenter.y + centerToSwimmer.dy * this.poolRadius/Math.abs(centerToSwimmer.len),
+        };
+
+        // time for coach to get to the swimmer's closest point on the rim. rad/s
+        const omega = this.speedOf(opponent) / this.poolRadius;
+
+        const thetaS = centerToSwimmer.len === 0 ?
+            0 : Math.atan2(centerToSwimmer.dy, centerToSwimmer.dx);
+        const thetaC = Math.atan2(
+            opponent.position.y - this.poolCenter.y,
+            opponent.position.x - this.poolCenter.x
+        );
+
+        // min angle for the coach to get to the swimmer's closest point on the rim
+        let dPhi = ((thetaS - thetaC) % (2 * Math.PI) + 2 * Math.PI) % (2 * Math.PI);
+        if (dPhi > Math.PI) dPhi = 2 * Math.PI - dPhi;
+
+        // time for coach to get to the rim
+        const tCoach = omega <= CATCH_EPS ? Number.POSITIVE_INFINITY : dPhi / omega;
+
+        if (tSwimmer < tCoach) {
+            const nx = this.pos.x +
+        }
+
+
+
 
         // candidate next position
         const nx = this.pos.x + dir.uVector.ux * this.speed * dt;

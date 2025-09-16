@@ -4,7 +4,7 @@ export type UnitVector = { ux: number; uy: number };
 export type MyVector = { vx: number; vy: number };
 export type UnitDirection = { uVector: UnitVector; distance: number };
 
-export const CATCH_EPS = 1e-2 as const;
+export const CATCH_EPS = 1e-1 as const;
 
 export type StepResult =
     | { kind: "ok" }
@@ -16,3 +16,5 @@ export const OK: StepResult = {kind: "ok"};
 export const CAUGHT: StepResult = {kind: "caught"};
 
 export const FLED : StepResult = {kind: "fled"};
+
+export const TIME_MARGIN: number = 0.02;
