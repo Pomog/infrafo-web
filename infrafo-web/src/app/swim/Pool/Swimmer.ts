@@ -1,5 +1,5 @@
 import {Actor} from "@/app/swim/Pool/Actor";
-import {ANG_EPS, CATCH_EPS, CAUGHT, Delta, FLED, OK, Point, StepResult} from "@/app/swim/Pool/Types";
+import {ANG_EPS, CATCH_EPS, CAUGHT, Delta, FLED, OK, Point, StepResult, UnitVector} from "@/app/swim/Pool/Types";
 
 export class Swimmer extends Actor {
     private readonly poolRadius: number;
@@ -64,6 +64,8 @@ export class Swimmer extends Actor {
 
         // ---- DASH mode
         if (tSwimmer < tCoach) {
+            // find the target point using Chord coach-swimmer-rim
+            const targetPoint =
             const step = this.speed * dt;
             if (step >= distanceToRim) {
                 this.pos = {
@@ -161,5 +163,38 @@ export class Swimmer extends Actor {
         }
 
 
+    }
+
+    /**
+     * Intersection of the line through (Swimmer, Coach) with the rim (circle),
+     * Returns exit point, unit direction, and distance along this chord.
+     */
+    private computeChordExitAwayFromCoach(coachPos: Point): { exit: Point; dir: UnitVector; dist: number } {
+        // unit direction û: from coach to swimmer
+        const unitChord = this.directionFrom(coachPos);
+        if (!unitChord) {
+            throw new Error("Get caught!");
+        }
+
+        // 2) p = S - O
+        const px = this.pos.x - this.poolCenter.x;
+        const py = this.pos.y - this.poolCenter.y;
+
+        // a = p·û
+        const a  = px * unitChord.uVector.ux + py * unitChord.uVector.uy;
+
+        // ||p||^2
+        const p2 = px * px + py * py;
+        const R2 = this.poolRadius * this.poolRadius;
+
+        // ||w||^2 = ||p||^2 - a^2  (component ⟂ û)
+        const w2 = Math.max(0, p2 - a * a);
+
+
+        return {
+            exit: { x: exitX, y: exitY },
+            dir: { ux, uy },
+            dist: lam, // distance along the chord
+        };
     }
 }

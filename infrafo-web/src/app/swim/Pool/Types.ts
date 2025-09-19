@@ -18,4 +18,4 @@ export const CAUGHT: StepResult = {kind: "caught"};
 
 export const FLED : StepResult = {kind: "fled"};
 
-export const TIME_MARGIN: number = 0.02;
+type SwimmerMode = "orbit" | "dash";
