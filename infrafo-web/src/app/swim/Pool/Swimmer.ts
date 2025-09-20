@@ -1,5 +1,16 @@
 import {Actor} from "@/app/swim/Pool/Actor";
-import {ANG_EPS, CATCH_EPS, CAUGHT, Delta, FLED, OK, Point, StepResult, UnitVector} from "@/app/swim/Pool/Types";
+import {
+    ANG_EPS,
+    CATCH_EPS,
+    CAUGHT,
+    Delta,
+    FLED,
+    MyVector,
+    OK,
+    Point,
+    StepResult,
+    UnitVector
+} from "@/app/swim/Pool/Types";
 
 export class Swimmer extends Actor {
     private readonly poolRadius: number;
@@ -176,25 +187,34 @@ export class Swimmer extends Actor {
             throw new Error("Get caught!");
         }
 
-        // 2) p = S - O
-        const px = this.pos.x - this.poolCenter.x;
-        const py = this.pos.y - this.poolCenter.y;
+        // vector SO = S - O
+        const SO: MyVector = {
+            vx: this.pos.x - this.poolCenter.x,
+            vy: this.pos.y - this.poolCenter.y,
+        };
 
-        // a = p·û
-        const a  = px * unitChord.uVector.ux + py * unitChord.uVector.uy;
+        // Projection SO to unitChord. SO longitudinal component
+        const a: number  = SO.vx * unitChord.uVector.ux + SO.vy * unitChord.uVector.uy;
 
-        // ||p||^2
-        const p2 = px * px + py * py;
-        const R2 = this.poolRadius * this.poolRadius;
+        // Projection SO to the ⊥ unitChord. SO transverse component
+        const cross: number = SO.vx * unitChord.uVector.ux - SO.vy * unitChord.uVector.uy;
+        const w2: number = Math.max(0, cross * cross);
 
-        // ||w||^2 = ||p||^2 - a^2  (component ⟂ û)
-        const w2 = Math.max(0, p2 - a * a);
+        const R2: number = this.poolRadius * this.poolRadius;
+        const disc: number = Math.max(0, R2 - w2);
 
+        let lam: number = -a + Math.sqrt(disc);
+        if (lam < 0 && lam > -1e-12) lam = 0;
+
+        const exit: Point = {
+            x: this.pos.x + unitChord.uVector.ux * lam,
+            y: this.pos.y + unitChord.uVector.uy * lam,
+        };
 
         return {
-            exit: { x: exitX, y: exitY },
-            dir: { ux, uy },
-            dist: lam, // distance along the chord
+            exit,
+            dir: { ux: unitChord.uVector.ux, uy: unitChord.uVector.uy },
+            dist: lam,
         };
     }
 }
