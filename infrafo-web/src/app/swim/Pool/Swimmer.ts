@@ -42,55 +42,49 @@ export class Swimmer extends Actor {
             return FLED;
         }
 
+        const chord = this.computeChordExitAwayFromCoach(opponent.position);
+
         // time for swimmer to get to the rim
-        const tSwimmer: number = distanceToRim / this.speed;
+        const tSwimmer: number = chord.dist / this.speed;
 
         if (centerToSwimmer.len < CATCH_EPS) {
             // TODO: 0 division
         }
-        // closest point on the rim
-        const cpr: Point = {
-            x: this.poolCenter.x + centerToSwimmer.dx * this.poolRadius / Math.abs(centerToSwimmer.len),
-            y: this.poolCenter.y + centerToSwimmer.dy * this.poolRadius / Math.abs(centerToSwimmer.len),
-        };
 
-        const thetaS = centerToSwimmer.len === 0 ?
-            0 : Math.atan2(centerToSwimmer.dy, centerToSwimmer.dx);
-        const thetaC = Math.atan2(
-            opponent.position.y - this.poolCenter.y,
-            opponent.position.x - this.poolCenter.x
-        );
+        const thetaE = Math.atan2(chord.exit.y - this.poolCenter.y, chord.exit.x - this.poolCenter.x);
+        const thetaC = Math.atan2(opponent.position.y - this.poolCenter.y, opponent.position.x - this.poolCenter.x);
 
         // min angle for the coach to reach the swimmer's closest point on the rim
-        let dPhi = ((thetaS - thetaC) % (2 * Math.PI) + 2 * Math.PI) % (2 * Math.PI);
+        let dPhi = ((thetaE - thetaC) % (2 * Math.PI) + 2 * Math.PI) % (2 * Math.PI);
         if (dPhi > Math.PI) dPhi = 2 * Math.PI - dPhi;
 
         // coach angular speed
         const omegaCoach: number = this.speedOf(opponent) / this.poolRadius;
 
-        // TODO: calculated Swimmer angular speed in this point based on position and linear speed
-
         // time for coach to get to the swimmer's closest point on the rim. rad/s
         const tCoach = omegaCoach <= ANG_EPS ? Number.POSITIVE_INFINITY : dPhi / omegaCoach;
+
+        console.log("tCoach: ", tCoach);
+        console.log("omegaCoach: ", omegaCoach);
+        console.log("tSwimmer: ", tSwimmer);
+        console.log("exitDist: ", chord.dist);
 
         // ---- DASH mode
         if (tSwimmer < tCoach) {
             // find the target point using Chord coach-swimmer-rim
-            const targetPoint =
+            const exit = this.computeChordExitAwayFromCoach(opponent.position);
             const step = this.speed * dt;
-            if (step >= distanceToRim) {
+            if (step >= exit.dist) {
                 this.pos = {
-                    x: cpr.x,
-                    y: cpr.y,
+                    x: exit.exit.x,
+                    y: exit.exit.y,
                 };
                 return FLED;
             }
 
-            // TODO: will swimmer stand still in the center?
-            const invr = centerToSwimmer.len === 0 ? 0 : 1 / centerToSwimmer.len;
             this.pos = {
-                x: this.pos.x + centerToSwimmer.dx * invr * step,
-                y: this.pos.y + centerToSwimmer.dy * invr * step,
+                x: this.pos.x + exit.dir.ux * step,
+                y: this.pos.y + exit.dir.uy * step,
             };
             return OK;
         }
@@ -103,35 +97,17 @@ export class Swimmer extends Actor {
             ));
         const omegaSwimmer: number = this.speed / swimmerRadius;
 
-        console.log(omegaSwimmer, "    ", omegaCoach, "    ", centerToSwimmer.len);
+        console.log("centerToSwimmer.len", centerToSwimmer.len);
         console.log(this.position);
         console.log(opponent.position);
+
+        console.log("E:", chord.exit, " dist:", chord.dist);
+        console.log("tSwimmer:", tSwimmer, " tCoach:", tCoach, " |Δφ|:", Math.abs(dPhi), " ωc:", omegaCoach);
 
         // candidate next position
         const nx = this.pos.x + dir.uVector.ux * this.speed * dt;
         const ny = this.pos.y + dir.uVector.uy * this.speed * dt;
 
-        if (centerToSwimmer.len < this.speed / omegaCoach) {
-
-            // check rim crossing
-            const cx = nx - this.poolCenter.x;
-            const cy = ny - this.poolCenter.y;
-            const rNext = Math.hypot(cx, cy);
-
-            if (rNext >= this.poolRadius) {
-                // snap to the rim and report FLED
-                const inv = rNext === 0 ? 0 : this.poolRadius / rNext;
-                this.pos = {
-                    x: this.poolCenter.x + cx * inv,
-                    y: this.poolCenter.y + cy * inv,
-                };
-                return FLED;
-            }
-
-            // normal move
-            this.pos = {x: nx, y: ny};
-            return OK;
-        }
 
 
         // move by circle, do not increase radius, to get more far from the coach
@@ -173,6 +149,12 @@ export class Swimmer extends Actor {
             return OK;
         }
 
+        const r = Math.hypot(rx, ry) || 1;
+        const tx = -ry / r, ty = rx / r;
+        const tiny = this.speed * dt * 1e-3;
+        this.pos = { x: this.pos.x + tx * tiny, y: this.pos.y + ty * tiny };
+        return OK;
+
 
     }
 
@@ -197,8 +179,8 @@ export class Swimmer extends Actor {
         const a: number  = SO.vx * unitChord.uVector.ux + SO.vy * unitChord.uVector.uy;
 
         // Projection SO to the ⊥ unitChord. SO transverse component
-        const cross: number = SO.vx * unitChord.uVector.ux - SO.vy * unitChord.uVector.uy;
-        const w2: number = Math.max(0, cross * cross);
+        const cross: number = SO.vx * unitChord.uVector.uy - SO.vy * unitChord.uVector.ux;
+        const w2 = cross*cross;
 
         const R2: number = this.poolRadius * this.poolRadius;
         const disc: number = Math.max(0, R2 - w2);
