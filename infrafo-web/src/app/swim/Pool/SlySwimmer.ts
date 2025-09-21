@@ -1,5 +1,5 @@
 import {Actor} from "@/app/swim/Pool/Actor";
-import {OK, Point, StepResult} from "@/app/swim/Pool/Types";
+import {OK, Delta, Point, Polar, StepResult, UnitVector} from "@/app/swim/Pool/Types";
 
 
 export class SlySwimmer extends Actor {
@@ -15,7 +15,31 @@ export class SlySwimmer extends Actor {
         this.poolRadius = poolRadius;
         this.poolCenter = poolCenter;
     }
-    update(dt: number, opponent: Actor): StepResult {
+
+    private polarState(): Polar {
+        const vectorFromCenter: Delta = this.vecFrom(this.poolCenter);
+
+        const theta: number = Math.atan2(vectorFromCenter.dy, vectorFromCenter.dx);
+
+        // radial unit vector OS
+        const vr: UnitVector = this.normalize(vectorFromCenter.dx, vectorFromCenter.dy);
+
+        // tangential unit vector OS, rotate vr
+        const vt: UnitVector = {ux: -vr.uy, uy: vr.ux};
+
+        return { r: vectorFromCenter.len, theta, vr, vt };
+    }
+
+    private normalize(x: number, y: number): UnitVector {
+        const L = Math.hypot(x, y);
+        return L > 0 ? { ux: x / L, uy: y / L } : { ux: 1, uy: 0 };
+    }
+
+
+
+
+
+        update(dt: number, opponent: Actor): StepResult {
         return OK ;
     }
 

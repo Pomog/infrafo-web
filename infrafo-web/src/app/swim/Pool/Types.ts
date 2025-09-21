@@ -6,6 +6,7 @@ export type UnitDirection = { uVector: UnitVector; distance: number };
 
 export const CATCH_EPS = 1e-1 as const;
 export const ANG_EPS = 1e-9 as const;
+const SAFETY = 1e-6;
 
 export type StepResult =
     | { kind: "ok" }
@@ -18,4 +19,17 @@ export const CAUGHT: StepResult = {kind: "caught"};
 
 export const FLED : StepResult = {kind: "fled"};
 
-type SwimmerMode = "orbit" | "dash";
+export type SwimmerMode = "orbit" | "dash";
+
+export type Polar = {
+    r: number;
+    theta: number;
+    vr: UnitVector;
+    vt: UnitVector;
+};
+
+export type VelComponents = {
+    vr: number;
+    vt: number;
+    mode: "orbit" | "dash";
+};
