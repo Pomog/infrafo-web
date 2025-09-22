@@ -6,7 +6,13 @@ export type UnitDirection = { uVector: UnitVector; distance: number };
 
 export const CATCH_EPS = 1e-1 as const;
 export const ANG_EPS = 1e-9 as const;
+
+export const MIN_LEN = 1e-9 as const;
 const SAFETY = 1e-6;
+export const MARGIN = 1e-3;
+
+export const MAX_RATIO_VT_VR = 0.98;
+
 
 export type StepResult =
     | { kind: "ok" }

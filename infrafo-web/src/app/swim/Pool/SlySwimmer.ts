@@ -1,5 +1,16 @@
 import {Actor} from "@/app/swim/Pool/Actor";
-import {OK, Delta, Point, Polar, StepResult, UnitVector} from "@/app/swim/Pool/Types";
+import {
+    CAUGHT,
+    Delta,
+    MARGIN,
+    MAX_RATIO_VT_VR,
+    MIN_LEN,
+    OK,
+    Point,
+    Polar,
+    StepResult,
+    UnitVector
+} from "@/app/swim/Pool/Types";
 
 
 export class SlySwimmer extends Actor {
@@ -27,20 +38,74 @@ export class SlySwimmer extends Actor {
         // tangential unit vector OS, rotate vr
         const vt: UnitVector = {ux: -vr.uy, uy: vr.ux};
 
-        return { r: vectorFromCenter.len, theta, vr, vt };
+        return {r: vectorFromCenter.len, theta, vr, vt};
+    }
+
+    private angleOf(p: Point): number {
+        const dx = p.x - this.poolCenter.x;
+        const dy = p.y - this.poolCenter.y;
+        return Math.atan2(dy, dx);
+    }
+
+    private angDiff(a: number, b: number): number {
+        let d = a - b;
+        while (d > Math.PI) d -= 2 * Math.PI;
+        while (d < -Math.PI) d += 2 * Math.PI;
+        return d;
     }
 
     private normalize(x: number, y: number): UnitVector {
         const L = Math.hypot(x, y);
-        return L > 0 ? { ux: x / L, uy: y / L } : { ux: 1, uy: 0 };
+        return L > 0 ? {ux: x / L, uy: y / L} : {ux: 1, uy: 0};
     }
 
 
+    update(dt: number, opponent: Actor): StepResult {
+        // caught?
+        if (this.isCaught(opponent)) return CAUGHT;
+
+        // swimmer polar state
+        const sps: Polar = this.polarState();
+
+        // coach angle and angle diff swimmer - coach ([-π, π])
+        const thetaCoach = this.angleOf(opponent.position);
+        const dTheta = this.angDiff(sps.theta, thetaCoach);
+
+        // direction of tangent
+        const tangSign: -1 | 1 = dTheta >= 0 ? 1 : -1;
+        this.lastTangSign = tangSign;
+
+        // coach tangential speed
+        const vCoach = this.speedOf(opponent);
+        const omegaCoach = vCoach / this.poolRadius // 1/sec
+
+        // minimum required tangential component for overtaking
+        const r = Math.max(sps.r, MIN_LEN);
+        const vTotal = this.speed;
+        const vt_need = (omegaCoach + MARGIN) * r; // m/sec
+
+        // tan for speed component vectors ≤ K
+        const K = MAX_RATIO_VT_VR;
+
+        // the spiral shape limit
+        const vt_cap_by_ratio = (K / Math.sqrt(1 + K * K)) * vTotal;
+
+
+        // choose tangential speed component
+        const vt = Math.min(Math.max(vt_need, 0), vt_cap_by_ratio);
+
+        // TODO: what if vt > vTotal ???
+
+        // choose radial speed component
+        const vr = Math.sqrt(Math.max(vTotal * vTotal - vt * vt, 0));
 
 
 
-        update(dt: number, opponent: Actor): StepResult {
-        return OK ;
+
+        // 1. move by spiral away form the coach until tangential speed > coach tangential speed
+
+
+        return OK;
     }
 
 }
