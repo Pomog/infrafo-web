@@ -102,7 +102,7 @@ export class SlySwimmer extends Actor {
         this.tangentialVelocity = vtSigned;
         this.radialVelocity     = vr;
 
-        // combine total speed vector
+        // combine total speed vector. |(Vx, Vy)| = vTotal
         const Vx = (vr * sps.vr.ux) + (vtSigned * sps.vt.ux);
         const Vy = (vr * sps.vr.uy) + (vtSigned * sps.vt.uy);
         const V_len = Math.hypot(Vx, Vy);
