@@ -11,7 +11,7 @@ export const MIN_LEN = 1e-9 as const;
 const SAFETY = 1e-6;
 export const MARGIN = 1e-3;
 
-export const MAX_RATIO_VT_VR = 0.98;
+export const MAX_RATIO_VT_VR = 5;
 
 
 export type StepResult =

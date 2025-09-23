@@ -59,7 +59,6 @@ export class SlySwimmer extends Actor {
         return L > 0 ? {ux: x / L, uy: y / L} : {ux: 1, uy: 0};
     }
 
-
     update(dt: number, opponent: Actor): StepResult {
         // caught?
         if (this.isCaught(opponent)) return CAUGHT;
@@ -90,19 +89,36 @@ export class SlySwimmer extends Actor {
         // the spiral shape limit
         const vt_cap_by_ratio = (K / Math.sqrt(1 + K * K)) * vTotal;
 
-
         // choose tangential speed component
         const vt = Math.min(Math.max(vt_need, 0), vt_cap_by_ratio);
 
-        // TODO: what if vt > vTotal ???
+        // add sign to the tangential speed component
+        const vtSigned = tangSign * vt;
 
         // choose radial speed component
         const vr = Math.sqrt(Math.max(vTotal * vTotal - vt * vt, 0));
 
+        // save both speed component to the object properties
+        this.tangentialVelocity = vtSigned;
+        this.radialVelocity     = vr;
+
+        // combine total speed vector
+        const Vx = (vr * sps.vr.ux) + (vtSigned * sps.vt.ux);
+        const Vy = (vr * sps.vr.uy) + (vtSigned * sps.vt.uy);
+        const V_len = Math.hypot(Vx, Vy);
+        const EPS = 1e-12;
+        let ux = 1, uy = 0;
+        if (V_len > EPS) {
+            ux = Vx / V_len;
+            uy = Vy / V_len;
+        } else {
+            ux = sps.vr.ux;
+            uy = sps.vr.uy;
+        }
+
+        // TODO: move
 
 
-
-        // 1. move by spiral away form the coach until tangential speed > coach tangential speed
 
 
         return OK;
