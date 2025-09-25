@@ -1,5 +1,6 @@
 import {Actor} from "@/app/swim/Pool/Actor";
 import {
+    ANG_DEAD,
     CAUGHT,
     Delta,
     MARGIN,
@@ -71,8 +72,14 @@ export class SlySwimmer extends Actor {
         const dTheta = this.angDiff(sps.theta, thetaCoach);
 
         // direction of tangent
-        const tangSign: -1 | 1 = dTheta >= 0 ? 1 : -1;
-        this.lastTangSign = tangSign;
+        let tangSign: -1 | 1;
+
+        if (Math.abs(dTheta) < ANG_DEAD) {
+            tangSign = this.lastTangSign;
+        } else {
+            tangSign = dTheta >= 0 ? 1 : -1;
+            this.lastTangSign = tangSign;
+        }
 
         // coach tangential speed
         const vCoach = this.speedOf(opponent);
@@ -81,7 +88,7 @@ export class SlySwimmer extends Actor {
         // minimum required tangential component for overtaking
         const r = Math.max(sps.r, MIN_LEN);
         const vTotal = this.speed;
-        const vt_need = (omegaCoach + MARGIN) * r; // m/sec
+        const vt_need = (omegaCoach * MARGIN) * r; // m/sec
 
         // tan for speed component vectors ≤ K
         const K = MAX_RATIO_VT_VR;
@@ -100,9 +107,17 @@ export class SlySwimmer extends Actor {
 
         // save both speed component to the object properties
         this.tangentialVelocity = vtSigned;
-        this.radialVelocity     = vr;
+        this.radialVelocity = vr;
 
-        // combine total speed vector. |(Vx, Vy)| = vTotal
+        console.log("tangentialVelocity: ", this.tangentialVelocity);
+        console.log("radialVelocity: ", this.radialVelocity);
+        console.log("vt_cap_by_ratio: ", vt_cap_by_ratio);
+        console.log("vTotal: ", vTotal);
+        console.log("opponent: ", this.speedOf(opponent));
+        console.log("omegaCoach: ", omegaCoach);
+        console.log("vt_need: ", vt_need);
+
+        // combine total speed vector. (Vx, Vy) = vTotal
         const Vx = (vr * sps.vr.ux) + (vtSigned * sps.vt.ux);
         const Vy = (vr * sps.vr.uy) + (vtSigned * sps.vt.uy);
         const V_len = Math.hypot(Vx, Vy);
@@ -112,16 +127,23 @@ export class SlySwimmer extends Actor {
             ux = Vx / V_len;
             uy = Vy / V_len;
         } else {
+            // go radial if total speed vector = 0
             ux = sps.vr.ux;
             uy = sps.vr.uy;
         }
 
-        // TODO: move
+        this.moveAlong({ux, uy}, dt);
 
-
-
+        const after = this.vecFrom(this.poolCenter);
+        if (after.len > this.poolRadius) {
+            const k = this.poolRadius / after.len;
+            this.pos = {
+                x: this.poolCenter.x + after.dx * k,
+                y: this.poolCenter.y + after.dy * k
+            };
+        }
+        if (this.isCaught(opponent)) return CAUGHT;
 
         return OK;
     }
-
 }

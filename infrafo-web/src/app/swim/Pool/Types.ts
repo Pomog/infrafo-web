@@ -9,9 +9,10 @@ export const ANG_EPS = 1e-9 as const;
 
 export const MIN_LEN = 1e-9 as const;
 const SAFETY = 1e-6;
-export const MARGIN = 1e-3;
+export const MARGIN = 1.5;
+export const ANG_DEAD = 1e-1;
 
-export const MAX_RATIO_VT_VR = 5;
+export const MAX_RATIO_VT_VR = 10;
 
 
 export type StepResult =
