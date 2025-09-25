@@ -88,7 +88,7 @@ export class SlySwimmer extends Actor {
         // minimum required tangential component for overtaking
         const r = Math.max(sps.r, MIN_LEN);
         const vTotal = this.speed;
-        const vt_need = (omegaCoach * MARGIN) * r; // m/sec
+        const vt_need = (omegaCoach + MARGIN) * r; // m/sec
 
         // tan for speed component vectors ≤ K
         const K = MAX_RATIO_VT_VR;
@@ -115,7 +115,19 @@ export class SlySwimmer extends Actor {
         console.log("vTotal: ", vTotal);
         console.log("opponent: ", this.speedOf(opponent));
         console.log("omegaCoach: ", omegaCoach);
+        console.log("omegaSwimmer: ", vtSigned/sps.r);
         console.log("vt_need: ", vt_need);
+
+        console.log({
+            r,
+            vt_need,
+            vt_cap_by_ratio,
+            vtSigned,
+            vr,
+            omegaCoach,
+            omegaSwim: Math.abs(vtSigned) / r,
+            overtaking: (Math.abs(vtSigned) / r) > omegaCoach
+        });
 
         // combine total speed vector. (Vx, Vy) = vTotal
         const Vx = (vr * sps.vr.ux) + (vtSigned * sps.vt.ux);
