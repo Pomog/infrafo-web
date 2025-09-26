@@ -1,5 +1,5 @@
 import {Actor} from "@/app/swim/Pool/Actor";
-import {Delta, Point, Polar, UnitVector} from "@/app/swim/Pool/Types";
+import {Delta, OK, Point, Polar, StepResult, UnitVector} from "@/app/swim/Pool/Types";
 
 export class Swimmer3 extends Actor {
 
@@ -34,6 +34,10 @@ export class Swimmer3 extends Actor {
         while (d > Math.PI) d -= 2 * Math.PI;
         while (d < -Math.PI) d += 2 * Math.PI;
         return d;
+    }
+
+    update(dt: number, opponent: Actor): StepResult {
+        return OK;
     }
 
 }
