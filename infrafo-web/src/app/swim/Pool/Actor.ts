@@ -45,6 +45,11 @@ export abstract class Actor {
         return this.distanceToActor(other) <= eps;
     }
 
+    protected normalize(x: number, y: number): UnitVector {
+        const L = Math.hypot(x, y);
+        return L > 0 ? {ux: x / L, uy: y / L} : {ux: 1, uy: 0};
+    }
+
     abstract update(dt: number, opponent: Actor): StepResult;
 
     public get position(): Point {
