@@ -65,17 +65,24 @@ export class Swimmer3 extends Actor {
         };
         const cLen = Math.hypot(coachVector.vx, coachVector.vy);
 
-        // L = R * α
         const dotProduct: number = (
             (swimmerVector.vx * coachVector.vx) +
             (swimmerVector.vy * coachVector.vy)
         );
 
-        // TODO
-        const crossProduct = 0;
+        const crossProduct = (
+            coachVector.vx * swimmerVector.vy -
+            coachVector.vy * swimmerVector.vx
+        );
 
+        const angleSigned = Math.atan2(crossProduct, dotProduct);
+        const angleCCW = ((angleSigned % (2*Math.PI)) + (2*Math.PI)) % (2*Math.PI);
 
+        // L = R * α
+        const arcCCW = this.poolRadius * angleCCW;
+        const arcCW  = this.poolRadius * ((2*Math.PI - angleCCW));
 
+        return Math.min(arcCCW, arcCW);
     }
 
     update(dt: number, opponent: Actor): StepResult {
