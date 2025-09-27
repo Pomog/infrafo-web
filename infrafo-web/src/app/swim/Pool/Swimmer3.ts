@@ -2,8 +2,8 @@ import {Actor} from "@/app/swim/Pool/Actor";
 import {Delta, MyVector, OK, Point, Polar, StepResult, UnitVector} from "@/app/swim/Pool/Types";
 
 export class Swimmer3 extends Actor {
-    private poolRadius: number;
-    private poolCenter: Point;
+    private readonly poolRadius: number;
+    private readonly poolCenter: Point;
 
     constructor(speed: number, start: Point, poolRadius: number, poolCenter: Point) {
         super(speed, start);
@@ -52,6 +52,14 @@ export class Swimmer3 extends Actor {
         }
     };
 
+    private getTimeToEscapePoint(): number {
+        return this.getDistanceToRim() / this.speed;
+    }
+
+    private getCoachTimeToEscapePoint(coach: Actor): number {
+        return this.getCoachDistanceToEscapePoint(coach) / this.speedOf(coach);
+    }
+
     private getCoachDistanceToEscapePoint(coach: Actor): number {
         const swimmerVector: MyVector = {
             vx: this.position.x - this.poolCenter.x,
@@ -63,7 +71,6 @@ export class Swimmer3 extends Actor {
             vx: coach.position.x - this.poolCenter.x,
             vy: coach.position.y - this.poolCenter.y,
         };
-        const cLen = Math.hypot(coachVector.vx, coachVector.vy);
 
         const dotProduct: number = (
             (swimmerVector.vx * coachVector.vx) +
