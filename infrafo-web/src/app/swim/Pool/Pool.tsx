@@ -1,10 +1,9 @@
 "use client";
 
 import React, { useEffect, useRef, useState } from "react";
-import { Swimmer } from "@/app/swim/Pool/Swimmer";
 import { Coach } from "@/app/swim/Pool/Coach";
 import { Point, StepResult } from "@/app/swim/Pool/Types";
-import {SlySwimmer} from "@/app/swim/Pool/SlySwimmer";
+import {Swimmer3} from "@/app/swim/Pool/Swimmer3";
 
 const STEP = 1 / 60;
 const DT_MAX = 0.05;
@@ -18,7 +17,7 @@ const SWIMMER_SPEED = 20;
 const COACH_SPEED = 80;
 
 export default function SwimAnim() {
-    const swimmerRef = useRef<SlySwimmer | null>(null);
+    const swimmerRef = useRef<Swimmer3 | null>(null);
     const coachRef = useRef<Coach | null>(null);
 
     const rafId = useRef<number | null>(null);
@@ -33,7 +32,7 @@ export default function SwimAnim() {
     useEffect(() => {
         const center: Point = { x: 0, y: 0 };
         // pass radius/center to Swimmer to detect "fled"
-        swimmerRef.current = new SlySwimmer(SWIMMER_SPEED, { x: 1, y: 0 }, R, center);
+        swimmerRef.current = new Swimmer3(SWIMMER_SPEED, { x: 1, y: 0 }, R, center);
         coachRef.current = new Coach(COACH_SPEED, { x: R, y: 0 }, R, center);
 
         rafId.current = requestAnimationFrame(tick);

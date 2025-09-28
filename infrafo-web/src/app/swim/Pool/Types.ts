@@ -28,6 +28,8 @@ export const FLED : StepResult = {kind: "fled"};
 
 export type SwimmerMode = "orbit" | "dash";
 
+export type StateName = 'BuildGap' | 'DashOut';
+
 export type Polar = {
     r: number;
     theta: number;

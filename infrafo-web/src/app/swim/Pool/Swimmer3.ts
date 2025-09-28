@@ -1,9 +1,10 @@
 import {Actor} from "@/app/swim/Pool/Actor";
-import {Delta, MyVector, OK, Point, Polar, StepResult, UnitVector} from "@/app/swim/Pool/Types";
+import {CATCH_EPS, Delta, MyVector, OK, Point, Polar, StateName, StepResult, UnitVector} from "@/app/swim/Pool/Types";
 
 export class Swimmer3 extends Actor {
     private readonly poolRadius: number;
     private readonly poolCenter: Point;
+    private state: StateName = 'BuildGap';
 
     constructor(speed: number, start: Point, poolRadius: number, poolCenter: Point) {
         super(speed, start);
@@ -31,7 +32,7 @@ export class Swimmer3 extends Actor {
         return Math.atan2(dy, dx);
     }
 
-    private angDiff(a: number, b: number): number {
+    private angDiffRad(a: number, b: number): number {
         let d = a - b;
         while (d > Math.PI) d -= 2 * Math.PI;
         while (d < -Math.PI) d += 2 * Math.PI;
@@ -47,13 +48,14 @@ export class Swimmer3 extends Actor {
     private getEscapePoint(): Point {
         const radialUnitVector = this.polarState().vr;
         return {
-            x: radialUnitVector.ux * this.poolRadius,
-            y: radialUnitVector.uy * this.poolRadius,
+            x: this.poolCenter.x + radialUnitVector.ux * this.poolRadius,
+            y: this.poolCenter.x + radialUnitVector.uy * this.poolRadius,
         }
     };
 
     private getTimeToEscapePoint(): number {
-        return this.getDistanceToRim() / this.speed;
+        const dist = Math.max(0, this.getDistanceToRim());
+        return dist / this.speed;
     }
 
     private getCoachTimeToEscapePoint(coach: Actor): number {
@@ -92,7 +94,54 @@ export class Swimmer3 extends Actor {
         return Math.min(arcCCW, arcCW);
     }
 
-    update(dt: number, opponent: Actor): StepResult {
+    private moveAlong(dir: UnitVector, dt: number) {
+        const vx = dir.ux * this.speed;
+        const vy = dir.uy * this.speed;
+        this.pos.x += vx * dt;
+        this.pos.y += vy * dt;
+
+        const rx = this.pos.x - this.poolCenter.x;
+        const ry = this.pos.y - this.poolCenter.y;
+        const r  = Math.hypot(rx, ry);
+        if (r > this.poolRadius) {
+            const k = this.poolRadius / r;
+            this.pos.x = this.poolCenter.x + rx * k;
+            this.pos.y = this.poolCenter.y + ry * k;
+        }
+    }
+
+    update(dt: number, coach: Actor): StepResult {
+        const polar: Polar = this.polarState();
+        const thetaCoach = this.angleOf(coach.position);
+        const dThetaSigned = this.angDiffRad(polar.theta, thetaCoach);
+
+        console.log('pos', this.pos);
+        console.log(polar);
+        console.log(this.state);
+
+        console.log("dThetaSigned: ", dThetaSigned);
+
+        const swimmerT = this.getTimeToEscapePoint();
+        const coachT = this.getCoachTimeToEscapePoint(coach);
+        const shouldDash = swimmerT + CATCH_EPS < coachT;
+
+        console.log(this.state);
+        console.log(shouldDash);
+
+        if (this.state === 'BuildGap' && shouldDash) {
+            this.state = 'DashOut';
+        }
+
+        if (this.state === 'BuildGap') {
+            const tangentialDir = (dThetaSigned >= 0)
+                ? polar.vt
+                : ({ ux: -polar.vt.ux, uy: -polar.vt.uy } as UnitVector);
+            this.moveAlong(tangentialDir, dt);
+        } else {
+            this.moveAlong(polar.vr, dt);
+        }
+
+
         return OK;
     }
 

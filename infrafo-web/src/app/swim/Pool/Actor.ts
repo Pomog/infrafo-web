@@ -52,7 +52,7 @@ export abstract class Actor {
 
     abstract update(dt: number, opponent: Actor): StepResult;
 
-    public get position(): Point {
+    public get position(): Readonly<Point> {
         return {...this.pos};
     }
 }
