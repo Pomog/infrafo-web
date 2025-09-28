@@ -133,7 +133,7 @@ export class Swimmer3 extends Actor {
         }
 
         if (this.state === 'BuildGap') {
-            const tangentialDir = (dThetaSigned >= 0)
+            const tangentialDir = (dThetaSigned >= 10)
                 ? polar.vt
                 : ({ ux: -polar.vt.ux, uy: -polar.vt.uy } as UnitVector);
             this.moveAlong(tangentialDir, dt);
