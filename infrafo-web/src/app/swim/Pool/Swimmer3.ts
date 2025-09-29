@@ -12,6 +12,21 @@ export class Swimmer3 extends Actor {
         this.poolCenter = poolCenter;
     }
 
+    private getCoachAngularVelocity(coach: Actor): number {
+        return this.speedOf(coach)/this.poolRadius;
+    };
+
+    private getRequiredSwimmerTangentialSpeed(coach: Actor): number {
+        const coachAngularVelocity = this.getCoachAngularVelocity(coach);
+        return  Math.abs(coachAngularVelocity * this.polarState().r)*1.1
+    };
+
+    private getRadialSpeed(coach: Actor): number {
+        const vt = this.getRequiredSwimmerTangentialSpeed(coach);
+        if (vt >= this.speed) return 0;
+        return Math.sqrt(this.speed*this.speed - vt*vt);
+    }
+
     private polarState(): Polar {
         const deltaCenter: Delta = this.vecFrom(this.poolCenter);
 
@@ -49,7 +64,7 @@ export class Swimmer3 extends Actor {
         const radialUnitVector = this.polarState().vr;
         return {
             x: this.poolCenter.x + radialUnitVector.ux * this.poolRadius,
-            y: this.poolCenter.x + radialUnitVector.uy * this.poolRadius,
+            y: this.poolCenter.y + radialUnitVector.uy * this.poolRadius,
         }
     };
 
@@ -59,15 +74,15 @@ export class Swimmer3 extends Actor {
     }
 
     private getCoachTimeToEscapePoint(coach: Actor): number {
-        return this.getCoachDistanceToEscapePoint(coach) / this.speedOf(coach);
+        const arcLength = this.getCoachAngleToEscapePoint(coach) * this.poolRadius;
+        return arcLength / this.speedOf(coach);
     }
 
-    private getCoachDistanceToEscapePoint(coach: Actor): number {
+    private getCoachAngleToEscapePoint(coach: Actor): number {
         const swimmerVector: MyVector = {
             vx: this.position.x - this.poolCenter.x,
             vy: this.position.y - this.poolCenter.y,
         };
-        const sLen = Math.hypot(swimmerVector.vx, swimmerVector.vy);
 
         const coachVector: MyVector = {
             vx: coach.position.x - this.poolCenter.x,
@@ -91,14 +106,13 @@ export class Swimmer3 extends Actor {
         const arcCCW = this.poolRadius * angleCCW;
         const arcCW  = this.poolRadius * ((2*Math.PI - angleCCW));
 
+
         return Math.min(arcCCW, arcCW);
     }
 
-    private moveAlong(dir: UnitVector, dt: number) {
-        const vx = dir.ux * this.speed;
-        const vy = dir.uy * this.speed;
-        this.pos.x += vx * dt;
-        this.pos.y += vy * dt;
+    private moveByVelocity(speedVector: MyVector, dt: number) {
+        this.pos.x += speedVector.vx * dt;
+        this.pos.y += speedVector.vy * dt;
 
         const rx = this.pos.x - this.poolCenter.x;
         const ry = this.pos.y - this.poolCenter.y;
@@ -125,6 +139,9 @@ export class Swimmer3 extends Actor {
         const coachT = this.getCoachTimeToEscapePoint(coach);
         const shouldDash = swimmerT + CATCH_EPS < coachT;
 
+        console.log("coachT: ", coachT);
+        console.log("swimmerT: ", swimmerT);
+
         console.log(this.state);
         console.log(shouldDash);
 
@@ -133,13 +150,31 @@ export class Swimmer3 extends Actor {
         }
 
         if (this.state === 'BuildGap') {
-            const tangentialDir = (dThetaSigned >= 10)
-                ? polar.vt
-                : ({ ux: -polar.vt.ux, uy: -polar.vt.uy } as UnitVector);
-            this.moveAlong(tangentialDir, dt);
+
+            const vtMag: number = this.getRequiredSwimmerTangentialSpeed(coach);
+
+            const vrMag = this.getRadialSpeed(coach);
+
+            console.log("vtMag: ", vtMag, " vrMag: ", vrMag);
+
+            const { vr, vt } = this.polarState();
+            const swimmerSpeedVector: MyVector = {
+                vx: vt.ux * vtMag + vr.ux * vrMag,
+                vy: vt.uy * vtMag + vr.uy * vrMag,
+            };
+
+            console.log("swimmerSpeedVector");
+            console.log(swimmerSpeedVector);
+
+            this.moveByVelocity(swimmerSpeedVector, dt);
+
+
         } else {
             this.moveAlong(polar.vr, dt);
         }
+
+
+
 
 
         return OK;
