@@ -1,4 +1,4 @@
-import {CATCH_EPS, Delta, Point, StepResult, UnitVector, UnitDirection} from "@/app/swim/Pool/Types";
+import {CATCH_EPS, Delta, Point, StepResult, UnitVector, UnitDirection, FLED} from "@/app/swim/Pool/Types";
 
 export abstract class Actor {
     protected pos: Point;
@@ -43,6 +43,11 @@ export abstract class Actor {
 
     protected isCaught(other: Actor, eps: number = CATCH_EPS): boolean {
         return this.distanceToActor(other) <= eps;
+    }
+
+    protected isFled(center: Point, radius: number){
+        const lenFromCenter = this.vecFrom(center);
+            return radius < lenFromCenter;
     }
 
     protected normalize(x: number, y: number): UnitVector {

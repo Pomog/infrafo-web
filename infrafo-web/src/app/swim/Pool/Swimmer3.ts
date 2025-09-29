@@ -153,7 +153,7 @@ export class Swimmer3 extends Actor {
 
         const polar: Polar = this.polarState();
 
-        if (polar.r < CATCH_EPS) {
+        if (this.isFled(this.poolCenter, this.poolRadius)) {
             return FLED;
         }
 
