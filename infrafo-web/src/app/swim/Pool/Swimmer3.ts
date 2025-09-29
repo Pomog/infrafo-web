@@ -1,5 +1,16 @@
 import {Actor} from "@/app/swim/Pool/Actor";
-import {CATCH_EPS, Delta, MyVector, OK, Point, Polar, StateName, StepResult, UnitVector} from "@/app/swim/Pool/Types";
+import {
+    CATCH_EPS,
+    CAUGHT,
+    Delta, FLED,
+    MyVector,
+    OK,
+    Point,
+    Polar,
+    StateName,
+    StepResult,
+    UnitVector
+} from "@/app/swim/Pool/Types";
 
 export class Swimmer3 extends Actor {
     private readonly poolRadius: number;
@@ -102,12 +113,10 @@ export class Swimmer3 extends Actor {
         const angleSigned = Math.atan2(crossProduct, dotProduct);
         const angleCCW = ((angleSigned % (2*Math.PI)) + (2*Math.PI)) % (2*Math.PI);
 
-        // L = R * α
-        const arcCCW = this.poolRadius * angleCCW;
-        const arcCW  = this.poolRadius * ((2*Math.PI - angleCCW));
+        const angleCW  = ((2*Math.PI - angleCCW));
 
 
-        return Math.min(arcCCW, arcCW);
+        return Math.min(angleCW, angleCCW);
     }
 
     private moveByVelocity(speedVector: MyVector, dt: number) {
@@ -124,8 +133,30 @@ export class Swimmer3 extends Actor {
         }
     }
 
+    protected moveAlong(uVector: UnitVector, dt: number): void {
+        this.pos = {
+            x: this.pos.x + uVector.ux * this.speed * dt,
+            y: this.pos.y + uVector.uy * this.speed * dt,
+        };
+        const rx = this.pos.x - this.poolCenter.x;
+        const ry = this.pos.y - this.poolCenter.y;
+        const r  = Math.hypot(rx, ry);
+        if (r > this.poolRadius) {
+            const k = this.poolRadius / r;
+            this.pos.x = this.poolCenter.x + rx * k;
+            this.pos.y = this.poolCenter.y + ry * k;
+        }
+    }
+
     update(dt: number, coach: Actor): StepResult {
+        if (this.isCaught(coach)) return CAUGHT;
+
         const polar: Polar = this.polarState();
+
+        if (polar.r < CATCH_EPS) {
+            return FLED;
+        }
+
         const thetaCoach = this.angleOf(coach.position);
         const dThetaSigned = this.angDiffRad(polar.theta, thetaCoach);
 
