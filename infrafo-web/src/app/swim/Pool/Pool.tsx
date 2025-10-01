@@ -13,8 +13,8 @@ const SCALE = 2; // UI scale
 const PAD = 24;  // padding around pool (px)
 const DOT = 14;  // dot size (px)
 
-const SWIMMER_SPEED = 200;
-const COACH_SPEED = 800;
+const SWIMMER_SPEED = 20;
+const COACH_SPEED = 80;
 
 export default function SwimAnim() {
     const swimmerRef = useRef<Swimmer3 | null>(null);
@@ -32,7 +32,7 @@ export default function SwimAnim() {
     useEffect(() => {
         const center: Point = { x: 0, y: 0 };
         // pass radius/center to Swimmer to detect "fled"
-        swimmerRef.current = new Swimmer3(SWIMMER_SPEED, { x: 1, y: 0 }, R, center);
+        swimmerRef.current = new Swimmer3(SWIMMER_SPEED, { x: 0, y: 0 }, R, center);
         coachRef.current = new Coach(COACH_SPEED, { x: R, y: 0 }, R, center);
 
         rafId.current = requestAnimationFrame(tick);

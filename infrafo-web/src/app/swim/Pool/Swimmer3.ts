@@ -71,14 +71,6 @@ export class Swimmer3 extends Actor {
         return this.poolRadius - Math.hypot(dx, dy);
     }
 
-    private getEscapePoint(): Point {
-        const radialUnitVector = this.polarState().vr;
-        return {
-            x: this.poolCenter.x + radialUnitVector.ux * this.poolRadius,
-            y: this.poolCenter.y + radialUnitVector.uy * this.poolRadius,
-        }
-    };
-
     private getTimeToEscapePoint(): number {
         const dist = Math.max(0, this.getDistanceToRim());
         return dist / this.speed;
@@ -122,31 +114,25 @@ export class Swimmer3 extends Actor {
     private moveByVelocity(speedVector: MyVector, dt: number) {
         this.pos.x += speedVector.vx * dt;
         this.pos.y += speedVector.vy * dt;
+        this.limitByPoolSize();
+    };
 
+    private limitByPoolSize() {
         const rx = this.pos.x - this.poolCenter.x;
         const ry = this.pos.y - this.poolCenter.y;
-        const r  = Math.hypot(rx, ry);
+        const r = Math.hypot(rx, ry);
         if (r > this.poolRadius) {
             const k = this.poolRadius / r;
             this.pos.x = this.poolCenter.x + rx * k;
             this.pos.y = this.poolCenter.y + ry * k;
         }
-    }
+    };
 
     protected moveAlong(uVector: UnitVector, dt: number): void {
-        this.pos = {
-            x: this.pos.x + uVector.ux * this.speed * dt,
-            y: this.pos.y + uVector.uy * this.speed * dt,
-        };
-        const rx = this.pos.x - this.poolCenter.x;
-        const ry = this.pos.y - this.poolCenter.y;
-        const r  = Math.hypot(rx, ry);
-        if (r > this.poolRadius) {
-            const k = this.poolRadius / r;
-            this.pos.x = this.poolCenter.x + rx * k;
-            this.pos.y = this.poolCenter.y + ry * k;
-        }
-    }
+        this.pos.x = this.pos.x + uVector.ux * this.speed * dt;
+        this.pos.y = this.pos.y + uVector.uy * this.speed * dt;
+        this.limitByPoolSize();
+    };
 
     update(dt: number, coach: Actor): StepResult {
         if (this.isCaught(coach)) return CAUGHT;
@@ -162,7 +148,6 @@ export class Swimmer3 extends Actor {
 
         console.log('pos', this.pos);
         console.log(polar);
-        console.log(this.state);
 
         console.log("dThetaSigned: ", dThetaSigned);
 
@@ -173,14 +158,9 @@ export class Swimmer3 extends Actor {
         console.log("coachT: ", coachT);
         console.log("swimmerT: ", swimmerT);
 
-        console.log(this.state);
         console.log(shouldDash);
 
-        if (this.state === 'BuildGap' && shouldDash) {
-            this.state = 'DashOut';
-        }
-
-        if (this.state === 'BuildGap') {
+        if (!shouldDash) {
 
             const vtMag: number = this.getRequiredSwimmerTangentialSpeed(coach);
 
@@ -188,6 +168,7 @@ export class Swimmer3 extends Actor {
 
             console.log("vtMag: ", vtMag, " vrMag: ", vrMag);
 
+            // TODO: this is wrong, the swimmer should move away from the coach and not away from the center
             const { vr, vt } = this.polarState();
             const swimmerSpeedVector: MyVector = {
                 vx: vt.ux * vtMag + vr.ux * vrMag,
