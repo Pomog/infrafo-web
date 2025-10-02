@@ -34,6 +34,7 @@ export class Swimmer3 extends Actor {
 
     private getRadialSpeed(coach: Actor): number {
         const vt = this.getRequiredSwimmerTangentialSpeed(coach);
+        // TODO here an error should be thrown as no solution possible
         if (vt >= this.speed) return 0;
         return Math.sqrt(this.speed*this.speed - vt*vt);
     }
@@ -162,14 +163,36 @@ export class Swimmer3 extends Actor {
 
         if (!shouldDash) {
 
+            // vtMag = 1.1 * ω_coach * r_swimmer
             const vtMag: number = this.getRequiredSwimmerTangentialSpeed(coach);
 
+            // vrMag = sqrt(speed^2 − vtMag^2)
             const vrMag = this.getRadialSpeed(coach);
 
             console.log("vtMag: ", vtMag, " vrMag: ", vrMag);
 
+            const vectorCoachSwimmer: Delta = this.vecFrom(coach.position)
+            const unitVectorCoachSwimmer = {
+                ux: vectorCoachSwimmer.dx / vectorCoachSwimmer.len,
+                uy: vectorCoachSwimmer.dy / vectorCoachSwimmer.len,
+            };
+
+            const speedMag = Math.min(
+                this.speed,
+                Math.hypot(vtMag, vrMag)
+            );
+
+            const swimmerSpeedVector2: MyVector = {
+                vx: unitVectorCoachSwimmer.ux * speedMag,
+                vy: unitVectorCoachSwimmer.uy * speedMag,
+            };
+
             // TODO: this is wrong, the swimmer should move away from the coach and not away from the center
             const { vr, vt } = this.polarState();
+
+
+            // TODO: add 3 state: Dash, Gap, Curl (vrMag form 1*CoachSpeed to 0.5*CoachSpeed)
+
             const swimmerSpeedVector: MyVector = {
                 vx: vt.ux * vtMag + vr.ux * vrMag,
                 vy: vt.uy * vtMag + vr.uy * vrMag,
