@@ -1,0 +1,15 @@
+import {SwimmerState} from "@/app/swim/Pool/swimmer/State";
+import {OK, StepResult, SwimmerStateName} from "@/app/swim/Pool/Types";
+import {Actor} from "@/app/swim/Pool/Actor";
+import {SwimmerV4} from "@/app/swim/Pool/swimmer/SwimmerV4";
+
+export class DashState implements SwimmerState {
+    readonly name: SwimmerStateName = "Dash";
+
+    constructor(private ctx: SwimmerV4) {}
+
+    update(coach: Actor, dt: number): StepResult {
+        return OK;
+    }
+
+}

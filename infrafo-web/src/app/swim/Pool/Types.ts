@@ -14,6 +14,8 @@ export const ANG_DEAD = 1e-1;
 
 export const MAX_RATIO_VT_VR = 5;
 
+export type SwimmerStateName = 'BuildGap' | 'Dash' | 'Curl';
+
 
 export type StepResult =
     | { kind: "ok" }
