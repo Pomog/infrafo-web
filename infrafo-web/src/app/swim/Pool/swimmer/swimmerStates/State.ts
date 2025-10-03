@@ -1,4 +1,4 @@
-import {StateName, StepResult, SwimmerStateName} from "@/app/swim/Pool/Types";
+import {StepResult, SwimmerStateName} from "@/app/swim/Pool/Types";
 import {Actor} from "@/app/swim/Pool/Actor";
 
 export interface SwimmerState {

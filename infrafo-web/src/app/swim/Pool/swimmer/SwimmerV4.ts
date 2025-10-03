@@ -1,13 +1,14 @@
 import {ActorV2} from "@/app/swim/Pool/swimmer/ActorV2";
-import {SwimmerState} from "@/app/swim/Pool/swimmer/State";
-import {Point, SwimmerStateName} from "@/app/swim/Pool/Types";
-import {GapState} from "@/app/swim/Pool/swimmer/GapState";
-import {DashState} from "@/app/swim/Pool/swimmer/DashState";
-import {CurlState} from "@/app/swim/Pool/swimmer/CurlState";
+import {SwimmerState} from "@/app/swim/Pool/swimmer/swimmerStates/State";
+import {CAUGHT, FLED, Point, StepResult, SwimmerStateName} from "@/app/swim/Pool/Types";
+import {GapState} from "@/app/swim/Pool/swimmer/swimmerStates/GapState";
+import {DashState} from "@/app/swim/Pool/swimmer/swimmerStates/DashState";
+import {CurlState} from "@/app/swim/Pool/swimmer/swimmerStates/CurlState";
+import {Actor} from "@/app/swim/Pool/Actor";
 
 export class SwimmerV4 extends ActorV2 {
     private readonly states: Record<SwimmerStateName, SwimmerState>;
-    private current: SwimmerState;
+    private currentState: SwimmerState;
 
     constructor(
         speed: number,
@@ -21,11 +22,17 @@ export class SwimmerV4 extends ActorV2 {
             Dash: new DashState(this),
             Curl: new CurlState(this),
         } satisfies Record<SwimmerStateName, SwimmerState>;
-        this.goto("Curl");
+        this.setCurrentState("Curl");
+    }
+
+    public setCurrentState(next: SwimmerStateName) {
+        this.currentState = this.states[next];
     };
 
-    public goto(next: SwimmerStateName) {
-        this.current = this.states[next];
-    };
+    update(coach: Actor, dt: number): StepResult {
+        if (this.isCaught(coach)) return CAUGHT;
+        if (this.isFled()) return FLED;
+        return this.currentState.update(coach, dt);
+    }
 
 }
