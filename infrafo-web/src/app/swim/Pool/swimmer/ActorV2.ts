@@ -1,4 +1,4 @@
-import {CATCH_EPS, Delta, Point, StepResult} from "@/app/swim/Pool/Types";
+import {CATCH_EPS, Delta, Point, StepResult, UnitVector} from "@/app/swim/Pool/Types";
 import {Actor} from "@/app/swim/Pool/Actor";
 
 export abstract class ActorV2 {
@@ -38,5 +38,29 @@ export abstract class ActorV2 {
     protected isFled(){
         const lenFromCenter = this.vecFrom(this.poolCenter);
         return this.poolRadius < lenFromCenter;
+    }
+
+    private limitByPoolSize() {
+        const rx = this.pos.x - this.poolCenter.x;
+        const ry = this.pos.y - this.poolCenter.y;
+        const r = Math.hypot(rx, ry);
+        if (r > this.poolRadius) {
+            const k = this.poolRadius / r;
+            this.pos.x = this.poolCenter.x + rx * k;
+            this.pos.y = this.poolCenter.y + ry * k;
+        }
+    };
+
+    protected moveAlong(uVector: UnitVector, dt: number): void {
+        this.pos.x = this.pos.x + uVector.ux * this.speed * dt;
+        this.pos.y = this.pos.y + uVector.uy * this.speed * dt;
+        this.limitByPoolSize();
+    };
+
+    private angDiffRad(a: number, b: number): number {
+        let d = a - b;
+        while (d > Math.PI) d -= 2 * Math.PI;
+        while (d < -Math.PI) d += 2 * Math.PI;
+        return d;
     }
 }

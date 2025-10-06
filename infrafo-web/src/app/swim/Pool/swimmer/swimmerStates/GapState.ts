@@ -1,4 +1,4 @@
-import {SwimmerState} from "@/app/swim/Pool/swimmer/swimmerStates/State";
+import {SwimmerState} from "@/app/swim/Pool/swimmer/swimmerStates/SwimmerState";
 import {SwimmerV4} from "@/app/swim/Pool/swimmer/SwimmerV4";
 import {Actor} from "@/app/swim/Pool/Actor";
 import {OK, StepResult, SwimmerStateName} from "@/app/swim/Pool/Types";
@@ -11,5 +11,7 @@ export class GapState implements SwimmerState {
     update(coach: Actor, dt: number): StepResult {
         return OK;
     }
+
+    MoveAway;
 
 }

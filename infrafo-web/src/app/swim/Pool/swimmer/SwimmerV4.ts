@@ -1,5 +1,5 @@
 import {ActorV2} from "@/app/swim/Pool/swimmer/ActorV2";
-import {SwimmerState} from "@/app/swim/Pool/swimmer/swimmerStates/State";
+import {SwimmerState} from "@/app/swim/Pool/swimmer/swimmerStates/SwimmerState";
 import {CAUGHT, FLED, Point, StepResult, SwimmerStateName} from "@/app/swim/Pool/Types";
 import {GapState} from "@/app/swim/Pool/swimmer/swimmerStates/GapState";
 import {DashState} from "@/app/swim/Pool/swimmer/swimmerStates/DashState";
