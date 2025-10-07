@@ -7,7 +7,7 @@ import {CurlState} from "@/app/swim/Pool/swimmer/swimmerStates/CurlState";
 import {Actor} from "@/app/swim/Pool/Actor";
 
 export class SwimmerV4 extends ActorV2 {
-    private readonly states: Record<SwimmerStateName, SwimmerState>;
+    private readonly states: { BuildGap: GapState; Dash: DashState; Curl: CurlState };
     private currentState: SwimmerState;
 
     constructor(
