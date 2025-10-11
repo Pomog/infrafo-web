@@ -6,12 +6,15 @@ import {OK, StepResult, SwimmerStateName} from "@/app/swim/Pool/Types";
 export class GapState implements SwimmerState {
     readonly name: SwimmerStateName = "BuildGap";
 
-    constructor(private ctx: SwimmerV4) {}
+    constructor(private ctx: SwimmerV4) {
+        this.swimmer = ctx;
+    }
 
     update(coach: Actor, dt: number): StepResult {
         return OK;
     }
 
     MoveAway;
+    swimmer: SwimmerV4;
 
 }

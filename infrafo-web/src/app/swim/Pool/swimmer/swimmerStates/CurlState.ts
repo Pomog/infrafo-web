@@ -5,13 +5,14 @@ import {SwimmerV4} from "@/app/swim/Pool/swimmer/SwimmerV4";
 
 export class CurlState implements SwimmerState {
     readonly name: SwimmerStateName = "Curl";
+    swimmer: SwimmerV4;
 
-    constructor(private ctx: SwimmerV4) {}
+    constructor(private ctx: SwimmerV4) {
+        this.swimmer = ctx;
+    }
 
     update(coach: Actor, dt: number): StepResult {
         return OK;
     }
-
-    MoveAway;
 
 }
