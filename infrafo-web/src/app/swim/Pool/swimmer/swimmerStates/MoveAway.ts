@@ -5,31 +5,23 @@ import {SwimmerV4} from "@/app/swim/Pool/swimmer/SwimmerV4";
 
 export class MoveAway implements SwimmerState {
     readonly name: SwimmerStateName = "MoveAway";
-    swimmer: SwimmerV4;
+    constructor(public swimmer: SwimmerV4) {}
 
-    constructor(private ctx: SwimmerV4) {
-        this.swimmer = ctx;
-    }
+    private getUnitVectorFrom = (position: Readonly<Point>): UnitVector => {
+        const delta = this.swimmer.vecFrom(position);
+        return { ux: delta.dx / delta.len, uy: delta.dy / delta.len };
+    };
+
+    private moveAlong(u: UnitVector, dt: number): void {
+        const s = this.swimmer;
+        s.pos.x += u.ux * s.speed * dt;
+        s.pos.y += u.uy * s.speed * dt;
+        s.limitByPoolSize?.();
+    };
 
     update(coach: Actor, dt: number): StepResult {
-        function getUnitVectorFrom(position: Readonly<Point>): UnitVector {
-            // TODO and What is THIS in this case? SwimmerState OR SwimmerV4 ???
-            const dx = this.pos.x - position.x;
-            const dy = this.pos.y - position.y;
-            const len = Math.hypot(dx, dy);
-            return {
-                ux: dx / len,
-                uy: dy / len
-            };
-        }
-
-        function moveAlong(uVector: UnitVector, dt: number): void {
-            this.pos.x = this.pos.x + uVector.ux * this.speed * dt;
-            this.pos.y = this.pos.y + uVector.uy * this.speed * dt;
-            this.limitByPoolSize();
-        }
-
-        const unitVectorCoachSwimmer: UnitVector = getUnitVectorFrom(coach.position);
+        const away: UnitVector = this.getUnitVectorFrom(coach.position);
+        this.moveAlong(away, dt);
         return OK;
     }
 

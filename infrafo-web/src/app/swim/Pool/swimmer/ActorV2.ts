@@ -2,10 +2,10 @@ import {CATCH_EPS, Delta, Point, StepResult, UnitVector} from "@/app/swim/Pool/T
 import {Actor} from "@/app/swim/Pool/Actor";
 
 export abstract class ActorV2 {
-    protected pos: Point;
+    pos: Point;
 
     protected constructor(
-        protected readonly speed: number,
+        readonly speed: number,
         protected readonly poolRadius: number,
         protected readonly poolCenter: Point,
         position: Point,
@@ -20,7 +20,7 @@ export abstract class ActorV2 {
 
     abstract update(opponent: Actor, dt: number): StepResult;
 
-    protected vecFrom(p: Point): Delta {
+    vecFrom(p: Point): Delta {
         const dx = this.pos.x - p.x;
         const dy = this.pos.y - p.y;
         const len = Math.hypot(dx, dy);
@@ -40,7 +40,7 @@ export abstract class ActorV2 {
         return this.poolRadius < lenFromCenter;
     }
 
-    private limitByPoolSize() {
+    limitByPoolSize() {
         const rx = this.pos.x - this.poolCenter.x;
         const ry = this.pos.y - this.poolCenter.y;
         const r = Math.hypot(rx, ry);
