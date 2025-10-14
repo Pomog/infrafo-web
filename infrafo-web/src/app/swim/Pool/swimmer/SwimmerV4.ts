@@ -5,9 +5,10 @@ import {GapState} from "@/app/swim/Pool/swimmer/swimmerStates/GapState";
 import {DashState} from "@/app/swim/Pool/swimmer/swimmerStates/DashState";
 import {CurlState} from "@/app/swim/Pool/swimmer/swimmerStates/CurlState";
 import {Actor} from "@/app/swim/Pool/Actor";
+import {MoveAway} from "@/app/swim/Pool/swimmer/swimmerStates/MoveAway";
 
 export class SwimmerV4 extends ActorV2 {
-    private readonly states: { BuildGap: GapState; Dash: DashState; Curl: CurlState };
+    private readonly states: { BuildGap: GapState; Dash: DashState; Curl: CurlState; MoveAway:  MoveAway};
     private currentState: SwimmerState;
 
     constructor(
@@ -21,6 +22,8 @@ export class SwimmerV4 extends ActorV2 {
             BuildGap: new GapState(this),
             Dash: new DashState(this),
             Curl: new CurlState(this),
+            MoveAway: new MoveAway(this),
+
         } satisfies Record<SwimmerStateName, SwimmerState>;
         this.setCurrentState("Curl");
     }
