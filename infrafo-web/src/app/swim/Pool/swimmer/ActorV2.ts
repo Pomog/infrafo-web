@@ -8,14 +8,36 @@ export abstract class ActorV2 {
         readonly speed: number,
         protected readonly poolRadius: number,
         protected readonly poolCenter: Point,
-        position: Point,
+        protected position: Point,
     ) {
         this.pos = {...position};
         this.poolCenter = { ...this.poolCenter }
     }
 
-    get position(): Point {
-        return { ...this.pos };
+    get position(): Readonly<Point> {
+        return this.pos;
+    }
+
+    setPosition(p: Readonly<Point>): void {
+        this.pos.x = p.x;
+        this.pos.y = p.y;
+        this.limitByPoolSize();
+    }
+
+    set position(p: Readonly<Point>) { this.setPosition(p); }
+
+    nudge(dx: number, dy: number): void {
+        this.pos.x += dx;
+        this.pos.y += dy;
+        this.limitByPoolSize();
+    }
+
+    moveAlong(u: UnitVector, dt: number): void {
+        this.nudge(u.ux * this.speed * dt, u.uy * this.speed * dt);
+    }
+
+    get poolCenter(): Readonly<Point> {
+        return this.poolCenter
     }
 
     abstract update(opponent: Actor, dt: number): StepResult;
@@ -37,7 +59,7 @@ export abstract class ActorV2 {
 
     protected isFled(){
         const lenFromCenter = this.vecFrom(this.poolCenter);
-        return this.poolRadius < lenFromCenter;
+        return this.poolRadius < lenFromCenter.len;
     }
 
     limitByPoolSize() {
@@ -51,10 +73,9 @@ export abstract class ActorV2 {
         }
     };
 
-    protected moveAlong(uVector: UnitVector, dt: number): void {
-        this.pos.x = this.pos.x + uVector.ux * this.speed * dt;
-        this.pos.y = this.pos.y + uVector.uy * this.speed * dt;
-        this.limitByPoolSize();
+    getUnitVectorFrom = (position: Readonly<Point>): UnitVector => {
+        const delta = this.vecFrom(position);
+        return { ux: delta.dx / delta.len, uy: delta.dy / delta.len };
     };
 
     private angDiffRad(a: number, b: number): number {
