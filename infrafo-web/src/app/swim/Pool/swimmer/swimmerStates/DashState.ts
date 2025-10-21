@@ -5,7 +5,6 @@ import {SwimmerV4} from "@/app/swim/Pool/swimmer/SwimmerV4";
 
 export class DashState implements SwimmerState {
     readonly name: SwimmerStateName = "Dash";
-
     constructor(public swimmer: SwimmerV4) {}
 
     update(coach: Actor, dt: number): StepResult {
@@ -13,6 +12,7 @@ export class DashState implements SwimmerState {
         this.swimmer.moveAlong(away, dt);
         return OK;
     }
+
 
 
 }

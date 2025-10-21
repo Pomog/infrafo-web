@@ -25,14 +25,12 @@ export class SwimmerV4 extends ActorV2 {
             MoveAway: new MoveAway(this),
 
         } satisfies Record<SwimmerStateName, SwimmerState>;
-        this.setCurrentState("Curl");
+        this.setCurrentState("MoveAway");
     }
 
     public setCurrentState(next: SwimmerStateName) {
         this.currentState = this.states[next];
     };
-
-
 
     update(coach: Actor, dt: number): StepResult {
         if (this.isCaught(coach)) return CAUGHT;

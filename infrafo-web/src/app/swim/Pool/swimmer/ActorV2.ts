@@ -40,6 +40,10 @@ export abstract class ActorV2 {
         return this.poolCenter
     }
 
+    get poolRadius(): Readonly<number> {
+        return this.poolRadius;
+    }
+
     abstract update(opponent: Actor, dt: number): StepResult;
 
     vecFrom(p: Point): Delta {
