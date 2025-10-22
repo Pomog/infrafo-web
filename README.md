@@ -9,6 +9,12 @@ npm i @reduxjs/toolkit react-redux
 npm i -D prettier
 ```
 
+## Task description
+```
+https://math.stackexchange.com/questions/31097/a-lady-and-a-monster
+```
+
+
 ## Reverse Between
 ```java
     public void reverseBetween(int m, int n) {

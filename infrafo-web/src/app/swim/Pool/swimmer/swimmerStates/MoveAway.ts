@@ -18,6 +18,7 @@ export class MoveAway implements SwimmerState {
     }
 
     readyToDash(): boolean {
+        console.debug("in MoveAway State center=", this.swimmer['poolCenter']);
         const lenToThePoolCenter: number = this.swimmer.vecFrom(this.swimmer.poolCenter).len;
         const poolRadius = this.swimmer.poolRadius;
         return lenToThePoolCenter/poolRadius > this.dashLimit;
