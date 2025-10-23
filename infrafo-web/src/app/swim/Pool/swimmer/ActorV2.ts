@@ -60,7 +60,7 @@ export abstract class ActorV2 {
         return this.vecFrom(other.position).len;
     }
 
-    protected isCaught(other: Actor, eps: number = CATCH_EPS): boolean {
+    protected isCaught(other: Actor, eps: number = MIN_LEN): boolean {
         return this.distanceToActor(other) <= eps;
     }
 
@@ -78,6 +78,26 @@ export abstract class ActorV2 {
 
         return { ux: delta.dx / delta.len, uy: delta.dy / delta.len };
     };
+
+    public normalizedDistanceFromCenter(): number {
+        const rx = this.pos.x - this.poolCenter.x;
+        const ry = this.pos.y - this.poolCenter.y;
+        const r  = Math.hypot(rx, ry);
+        return r / this.poolRadius;
+    }
+
+    public radialUnitFromCenter(): UnitVector {
+        const rx = this.pos.x - this.poolCenter.x;
+        const ry = this.pos.y - this.poolCenter.y;
+        const r  = Math.hypot(rx, ry);
+        const EPS = MIN_LEN;
+
+        if (!Number.isFinite(r) || r <= EPS) {
+            throw new Error("radialUnitFromCenter: actor at/near center; direction undefined");
+        }
+
+        return { ux: rx / r, uy: ry / r };
+    }
 
     private angDiffRad(a: number, b: number): number {
         let d = a - b;

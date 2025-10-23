@@ -8,8 +8,8 @@ export class DashState implements SwimmerState {
     constructor(public swimmer: SwimmerV4) {}
 
     update(coach: Actor, dt: number): StepResult {
-        const away: UnitVector = this.swimmer.getUnitVectorFrom(this.swimmer.poolCenter);
-        this.swimmer.moveAlong(away, dt);
+        const out = this.swimmer.radialUnitFromCenter();
+        this.swimmer.moveAlong(out, dt);
         return OK;
     }
 

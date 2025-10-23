@@ -5,7 +5,6 @@ import {SwimmerV4} from "@/app/swim/Pool/swimmer/SwimmerV4";
 
 export class MoveAway implements SwimmerState {
     readonly name: SwimmerStateName = "MoveAway";
-    readonly dashLimit: DASH_LIMIT;
     constructor(public swimmer: SwimmerV4) {}
 
     update(coach: Actor, dt: number): StepResult {
@@ -18,10 +17,7 @@ export class MoveAway implements SwimmerState {
     }
 
     readyToDash(): boolean {
-        console.debug("in MoveAway State center=", this.swimmer['poolCenter']);
-        const lenToThePoolCenter: number = this.swimmer.vecFrom(this.swimmer.poolCenter).len;
-        const poolRadius = this.swimmer.poolRadius;
-        return lenToThePoolCenter/poolRadius > this.dashLimit;
+        return  this.swimmer.normalizedDistanceFromCenter() > DASH_LIMIT;
     }
 
 }
