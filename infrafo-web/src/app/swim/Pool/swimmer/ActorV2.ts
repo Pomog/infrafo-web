@@ -32,6 +32,15 @@ export abstract class ActorV2 {
         this.limitByPoolSize();
     }
 
+    protected normalize(x: number, y: number): UnitVector {
+        const L = Math.hypot(x, y);
+        return L > 0 ? {ux: x / L, uy: y / L} : {ux: 1, uy: 0};
+    }
+
+    protected speedOf(other: Actor): number {
+        return other.speed;
+    }
+
     limitByPoolSize() {
         const rx = this.pos.x - this.poolCenter.x;
         const ry = this.pos.y - this.poolCenter.y;

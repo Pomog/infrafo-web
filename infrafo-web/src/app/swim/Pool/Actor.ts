@@ -4,7 +4,7 @@ export abstract class Actor {
     protected pos: Point;
 
     protected constructor(
-        protected readonly speed: number,
+        readonly speed: number,
         position: Point
     ) {
         this.pos = {...position};

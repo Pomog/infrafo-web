@@ -1,6 +1,6 @@
 import {ActorV2} from "@/app/swim/Pool/swimmer/ActorV2";
 import {SwimmerState} from "@/app/swim/Pool/swimmer/swimmerStates/SwimmerState";
-import {CAUGHT, FLED, Point, StepResult, SwimmerStateName, UnitVector} from "@/app/swim/Pool/Types";
+import {CAUGHT, Delta, FLED, Point, Polar, StepResult, SwimmerStateName, UnitVector} from "@/app/swim/Pool/Types";
 import {GapState} from "@/app/swim/Pool/swimmer/swimmerStates/GapState";
 import {DashState} from "@/app/swim/Pool/swimmer/swimmerStates/DashState";
 import {CurlState} from "@/app/swim/Pool/swimmer/swimmerStates/CurlState";
@@ -30,6 +30,24 @@ export class SwimmerV4 extends ActorV2 {
 
     public setCurrentState(next: SwimmerStateName) {
         this.currentState = this.states[next];
+    };
+
+    polarState(): Polar {
+        const deltaCenter: Delta = this.vecFrom(this.poolCenter);
+
+        const theta: number = Math.atan2(deltaCenter.dy, deltaCenter.dx);
+
+        // radial unit vector OS
+        const vr: UnitVector = this.normalize(deltaCenter.dx, deltaCenter.dy);
+
+        // tangential unit vector OS, rotate vr
+        const vt: UnitVector = {ux: -vr.uy, uy: vr.ux};
+
+        return {r: deltaCenter.len, theta, vr, vt};
+    }
+
+    getCoachAngularVelocity(coach: Actor): number {
+        return this.speedOf(coach)/this.poolRadius;
     };
 
     update(coach: Actor, dt: number): StepResult {

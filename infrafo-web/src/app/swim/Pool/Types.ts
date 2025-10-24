@@ -17,6 +17,7 @@ export const MAX_RATIO_VT_VR = 5;
 export type SwimmerStateName = 'BuildGap' | 'Dash' | 'Curl' | 'MoveAway';
 
 export const DASH_LIMIT: number = 0.1;
+export const OVER_COACH: number = 1.1;
 
 
 export type StepResult =
