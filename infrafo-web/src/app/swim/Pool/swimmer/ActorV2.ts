@@ -1,4 +1,4 @@
-import {CATCH_EPS, Delta, MIN_LEN, Point, StepResult, UnitVector} from "@/app/swim/Pool/Types";
+import {ANG_DEAD, CATCH_EPS, Delta, MIN_LEN, Point, StepResult, UnitVector} from "@/app/swim/Pool/Types";
 import {Actor} from "@/app/swim/Pool/Actor";
 
 export abstract class ActorV2 {
@@ -122,4 +122,42 @@ export abstract class ActorV2 {
         while (d < -Math.PI) d += 2 * Math.PI;
         return d;
     }
+
+    /**
+     * Returns true if `this` and `other` lie on the same line through the pool center
+     * but on OPPOSITE sides (i.e., angle between their radial unit vectors is ~ π).
+     *
+     * @param other   The opponent actor to compare against.
+     * @param angDead Angular tolerance in radians (defaults to ANG_DEAD).
+     */
+    public isOppositeThroughCenter(other: Actor, angDead: number = ANG_DEAD): boolean {
+        // Vector center -> this
+        const csx = this.pos.x - this.poolCenter.x;
+        const csy = this.pos.y - this.poolCenter.y;
+        const csLen = Math.hypot(csx, csy);
+
+        // Vector center -> other
+        const ckx = other.position.x - this.poolCenter.x;
+        const cky = other.position.y - this.poolCenter.y;
+        const ckLen = Math.hypot(ckx, cky);
+
+        // Both radii must be well-defined
+        if (!(csLen > MIN_LEN && ckLen > MIN_LEN)) return false;
+
+        // Normalize to radial unit vectors
+        const csux = csx / csLen, csuy = csy / csLen; // unit(center->this)
+        const ckux = ckx / ckLen, ckuy = cky / ckLen; // unit(center->other)
+
+        // For unit vectors: dot = cos(Δθ), cross(z) = sin(Δθ)
+        const dot   = csux * ckux + csuy * ckuy;        // cos(Δθ)
+        const cross = csux * ckuy - csuy * ckux;        // sin(Δθ)
+
+        const cosTol = Math.cos(angDead);
+        const sinTol = Math.sin(angDead);
+
+        // Opposite sides ≈ angle = π: |sin| small and cos -1
+        return Math.abs(cross) <= Math.abs(sinTol) && dot <= -Math.abs(cosTol);
+    }
+
+
 }
