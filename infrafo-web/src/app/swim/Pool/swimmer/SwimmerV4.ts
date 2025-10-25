@@ -32,7 +32,7 @@ export class SwimmerV4 extends ActorV2 {
         this.currentState = this.states[next];
     };
 
-    polarState(): Polar {
+    public polarState(): Polar {
         const deltaCenter: Delta = this.vecFrom(this.poolCenter);
 
         const theta: number = Math.atan2(deltaCenter.dy, deltaCenter.dx);
@@ -46,11 +46,11 @@ export class SwimmerV4 extends ActorV2 {
         return {r: deltaCenter.len, theta, vr, vt};
     }
 
-    getCoachAngularVelocity(coach: Actor): number {
+    public getCoachAngularVelocity(coach: Actor): number {
         return this.speedOf(coach)/this.poolRadius;
     };
 
-    update(coach: Actor, dt: number): StepResult {
+    public update(coach: Actor, dt: number): StepResult {
         if (this.isCaught(coach)) return CAUGHT;
         if (this.isFled()) return FLED;
         return this.currentState.update(coach, dt);

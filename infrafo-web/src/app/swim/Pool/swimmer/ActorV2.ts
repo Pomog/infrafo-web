@@ -52,6 +52,14 @@ export abstract class ActorV2 {
         }
     };
 
+    public getPoolCenter(): Readonly<Point> {
+        return { x: this.poolCenter.x, y: this.poolCenter.y };
+    }
+
+    public getPoolRadius(): number {
+        return this.poolRadius;
+    }
+
     moveAlong(u: UnitVector, dt: number): void {
         this.nudge(u.ux * this.speed * dt, u.uy * this.speed * dt);
     }
