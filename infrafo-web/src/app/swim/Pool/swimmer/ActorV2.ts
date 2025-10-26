@@ -1,4 +1,4 @@
-import {ANG_DEAD, CATCH_EPS, Delta, MIN_LEN, Point, StepResult, UnitVector} from "@/app/swim/Pool/Types";
+import {ANG_DEAD, ANG_EPS, CATCH_EPS, Delta, MIN_LEN, Point, StepResult, UnitVector} from "@/app/swim/Pool/Types";
 import {Actor} from "@/app/swim/Pool/Actor";
 
 export abstract class ActorV2 {
@@ -156,7 +156,9 @@ export abstract class ActorV2 {
         const sinTol = Math.sin(angDead);
 
         // Opposite sides ≈ angle = π: |sin| small and cos -1
-        return Math.abs(cross) <= Math.abs(sinTol) && dot <= -Math.abs(cosTol);
+        return (
+            Math.abs(cross) + Math.abs(sinTol) <= ANG_EPS && dot + cosTol <= ANG_EPS
+        );
     }
 
 
