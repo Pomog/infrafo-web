@@ -23,7 +23,7 @@ export class CurlState implements SwimmerState {
         const {r, vr, vt} = this.swimmer.polarState();
 
         // TODO: add sign - CCW CW
-        const omega = this.swimmer.getCoachAngularVelocity(coach); // рад/с
+        const omega = this.swimmer.getCoachAngularVelocity(coach);
 
         const vtMag = Math.abs(omega * r) * OVER_COACH;
         if (!Number.isFinite(vtMag) || vtMag >= this.swimmer.speed) {

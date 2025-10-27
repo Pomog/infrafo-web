@@ -77,7 +77,7 @@ export abstract class ActorV2 {
         return this.vecFrom(other.position).len;
     }
 
-    protected isCaught(other: Actor, eps: number = MIN_LEN): boolean {
+    protected isCaught(other: Actor, eps: number = CATCH_EPS): boolean {
         return this.distanceToActor(other) <= eps;
     }
 
@@ -152,13 +152,8 @@ export abstract class ActorV2 {
         const dot   = csux * ckux + csuy * ckuy;        // cos(Δθ)
         const cross = csux * ckuy - csuy * ckux;        // sin(Δθ)
 
-        const cosTol = Math.cos(angDead);
-        const sinTol = Math.sin(angDead);
-
         // Opposite sides ≈ angle = π: |sin| small and cos -1
-        return (
-            Math.abs(cross) + Math.abs(sinTol) <= ANG_EPS && dot + cosTol <= ANG_EPS
-        );
+        return Math.abs(cross) <= Math.sin(ANG_DEAD) && dot <= -Math.cos(ANG_DEAD);
     }
 
 
