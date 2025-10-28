@@ -104,3 +104,41 @@ https://math.stackexchange.com/questions/31097/a-lady-and-a-monster
     }
 ```
 
+## Reverse Between 
+```java
+     public void reverseBetween(int startIndex, int endIndex) {
+        //   +===================================================+
+        //   |               WRITE YOUR CODE HERE                |
+        //   | Description:                                      |
+        //   | - Reverses a portion of a doubly linked list      |
+        //   |   between two indices (inclusive range).          |
+        //   | - Only nodes between startIndex and endIndex are  |
+        //   |   reversed in place.                              |
+        //   |                                                   |
+        //   | Behavior:                                         |
+        //   | - A dummy node simplifies handling edge cases.    |
+        //   | - `prev` is positioned just before the reversal.  |
+        //   | - Nodes are relocated one at a time to reverse    |
+        //   |   their order within the specified segment.       |
+        //   | - All `next` and `prev` pointers are correctly    |
+        //   |   updated to maintain list integrity.             |
+        //   | - The head pointer is reset at the end.           |
+        //   +===================================================+
+        
+        Node prev = new Node(0);
+        prev.next = curr;
+        Node curr = this.head;
+        Node next = curr.next;
+        
+        // go tho the startIndex ind
+        for(int i=0; i<startIndex; i++){
+            prev = prev.next;
+            curr = curr.next;
+            next = next.next;
+        }
+        
+        
+        
+    }
+    ```
+
