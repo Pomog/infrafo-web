@@ -11,7 +11,7 @@ export class MoveAway implements SwimmerState {
         const away: UnitVector = this.swimmer.getUnitVectorFrom(coach.position);
         this.swimmer.moveAlong(away, dt);
         if (this.readyToDash()){
-            this.swimmer.setCurrentState("BuildGap");
+            this.swimmer.setCurrentState("Curl");
         }
         return OK;
     }
