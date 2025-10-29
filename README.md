@@ -104,9 +104,9 @@ https://math.stackexchange.com/questions/31097/a-lady-and-a-monster
     }
 ```
 
-## Reverse Between 
+## Reverse Between DLL
 ```java
-     public void reverseBetween(int startIndex, int endIndex) {
+public void reverseBetween(int startIndex, int endIndex) {
         //   +===================================================+
         //   |               WRITE YOUR CODE HERE                |
         //   | Description:                                      |
@@ -125,20 +125,50 @@ https://math.stackexchange.com/questions/31097/a-lady-and-a-monster
         //   | - The head pointer is reset at the end.           |
         //   +===================================================+
         
-        Node prev = new Node(0);
-        prev.next = curr;
-        Node curr = this.head;
-        Node next = curr.next;
+        if (head == null || startIndex >= endIndex) return;
         
+        Node dummy = new Node(0);
+        dummy.next = head;
+        head.prev = dummy;
+        
+        Node pre = dummy;
+
         // go tho the startIndex ind
         for(int i=0; i<startIndex; i++){
-            prev = prev.next;
-            curr = curr.next;
-            next = next.next;
+            if (pre.next == null) {
+                head.prev = null;
+                return;
+            }
+             pre = pre.next;
         }
         
+        Node curr = pre.next;
         
+        if (curr == null) {                     
+            head = dummy.next;
+            head.prev = null;
+            return;
+        }
         
+        for(int i=0; i < endIndex - startIndex; i++){
+            Node toMove = curr.next;
+            if (toMove == null) break;
+            
+            curr.next = toMove.next;
+            if (toMove.next != null) {
+                toMove.next.prev = curr;    
+            }
+            
+            toMove.next = pre.next;
+            pre.next.prev = toMove; 
+            
+            pre.next = toMove;
+            
+            toMove.prev = pre;
+        }
+        
+        head = dummy.next;
+        head.prev = null;
     }
     ```
 
