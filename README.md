@@ -171,4 +171,41 @@ public void reverseBetween(int startIndex, int endIndex) {
         head.prev = null;
     }
     ```
+## Swap Pairs
+```java
+public void swapPairs(){
+        if (head == null || head.next == null) return;
+        
+        Node preHead = new Node(0);
+        preHead.next = head;
+        head.prev = preHead;
+        
+        Node curr = head;
+        
+        while (curr != null && curr.next != null) {
+            Node first  = curr;         
+            Node second = curr.next;
+            
+            Node before = first.prev;
+            Node after  = second.next;
+            
+            // before -> second
+            if (before != null) before.next = second;
+            second.prev = before;
+            
+            // second -> first
+            second.next = first;
+            first.prev  = second;
+            
+            // first -> after
+            first.next = after;
+            if (after != null) after.prev = first;
+            
+            curr = after;
+        }
+        
+        this.head = preHead.next;
+        head.prev = null;
+    }
+```
 
