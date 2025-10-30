@@ -170,7 +170,7 @@ public void reverseBetween(int startIndex, int endIndex) {
         head = dummy.next;
         head.prev = null;
     }
-    ```
+```
 ## Swap Pairs
 ```java
 public void swapPairs(){
