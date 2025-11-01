@@ -10,10 +10,6 @@ export class CurlState implements SwimmerState {
     }
 
     update(coach: Actor, dt: number): StepResult {
-        if (this.swimmer.isOppositeThroughCenter(coach)) {
-            this.swimmer.setCurrentState("BuildGap");
-            return OK;
-        }
         const dir: UnitVector = this.curlDirection(coach);
         this.swimmer.moveAlong(dir, dt);
         return OK;
