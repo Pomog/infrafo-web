@@ -10,14 +10,7 @@ export class MoveAway implements SwimmerState {
     update(coach: Actor, dt: number): StepResult {
         const away: UnitVector = this.swimmer.getUnitVectorFrom(coach.position);
         this.swimmer.moveAlong(away, dt);
-        if (this.readyToDash()){
-            this.swimmer.setCurrentState("Curl");
-        }
+
         return OK;
     }
-
-    readyToDash(): boolean {
-        return  this.swimmer.normalizedDistanceFromCenter() > DASH_LIMIT;
-    }
-
 }

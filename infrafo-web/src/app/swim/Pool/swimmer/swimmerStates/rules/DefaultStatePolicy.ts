@@ -1,8 +1,8 @@
-import {RuleContext, StatePolicy} from "@/app/swim/Pool/swimmer/swimmerStates/rules/StatePolicy";
+import {StatePolicy} from "@/app/swim/Pool/swimmer/swimmerStates/rules/StatePolicy";
 import {CATCH_EPS, SwimmerStateName} from "@/app/swim/Pool/Types";
 import {SwimmerV4} from "@/app/swim/Pool/swimmer/SwimmerV4";
 import {Actor} from "@/app/swim/Pool/Actor";
-import {StateRule} from "@/app/swim/Pool/swimmer/swimmerStates/rules/policyRules";
+import {RuleContext, StateRule} from "@/app/swim/Pool/swimmer/swimmerStates/rules/policyRules";
 
 export class DefaultStatePolicy implements StatePolicy {
 

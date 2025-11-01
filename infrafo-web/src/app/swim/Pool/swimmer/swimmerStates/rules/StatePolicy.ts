@@ -10,13 +10,3 @@ export interface StatePolicy {
     decide(current: SwimmerStateName, swimmer: SwimmerV4, coach: Actor): SwimmerStateName | null
 }
 
-export type RuleContext = {
-    current: SwimmerStateName;
-    swimmer: SwimmerV4;
-    coach: Actor;
-    ratio: number;  // r/R -> normalizedDistanceFromCenter
-    opposite: boolean; // isOppositeThroughCenter
-    dist: number;
-    nearCatch: boolean;
-};
-
