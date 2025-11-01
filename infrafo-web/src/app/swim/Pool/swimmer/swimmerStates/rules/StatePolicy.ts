@@ -14,10 +14,9 @@ export type RuleContext = {
     current: SwimmerStateName;
     swimmer: SwimmerV4;
     coach: Actor;
-    ratio: number;
-    opposite: boolean;
+    ratio: number;  // r/R -> normalizedDistanceFromCenter
+    opposite: boolean; // isOppositeThroughCenter
     dist: number;
     nearCatch: boolean;
 };
 
-export type StateRule = (ctx: RuleContext) => SwimmerStateName | null;

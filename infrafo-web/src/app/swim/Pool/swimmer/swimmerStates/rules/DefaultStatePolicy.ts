@@ -1,7 +1,8 @@
-import {RuleContext, StatePolicy, StateRule} from "@/app/swim/Pool/swimmer/swimmerStates/StatePolicy";
+import {RuleContext, StatePolicy} from "@/app/swim/Pool/swimmer/swimmerStates/rules/StatePolicy";
 import {CATCH_EPS, SwimmerStateName} from "@/app/swim/Pool/Types";
 import {SwimmerV4} from "@/app/swim/Pool/swimmer/SwimmerV4";
 import {Actor} from "@/app/swim/Pool/Actor";
+import {StateRule} from "@/app/swim/Pool/swimmer/swimmerStates/rules/policyRules";
 
 export class DefaultStatePolicy implements StatePolicy {
 
@@ -15,7 +16,7 @@ export class DefaultStatePolicy implements StatePolicy {
         const ratio    = swimmer.normalizedDistanceFromCenter();
         const opposite = swimmer.isOppositeThroughCenter(coach);
         const dist     = swimmer.vecFrom(coach.position).len;
-        const nearCatch = Number.isFinite(dist) && dist <= 10 * CATCH_EPS;
+        const nearCatch = Number.isFinite(dist) && dist <= 2 * CATCH_EPS;
 
         const ctx: RuleContext = { current, swimmer, coach, ratio, opposite, dist, nearCatch };
 
