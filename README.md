@@ -104,3 +104,108 @@ https://math.stackexchange.com/questions/31097/a-lady-and-a-monster
     }
 ```
 
+## Reverse Between DLL
+```java
+public void reverseBetween(int startIndex, int endIndex) {
+        //   +===================================================+
+        //   |               WRITE YOUR CODE HERE                |
+        //   | Description:                                      |
+        //   | - Reverses a portion of a doubly linked list      |
+        //   |   between two indices (inclusive range).          |
+        //   | - Only nodes between startIndex and endIndex are  |
+        //   |   reversed in place.                              |
+        //   |                                                   |
+        //   | Behavior:                                         |
+        //   | - A dummy node simplifies handling edge cases.    |
+        //   | - `prev` is positioned just before the reversal.  |
+        //   | - Nodes are relocated one at a time to reverse    |
+        //   |   their order within the specified segment.       |
+        //   | - All `next` and `prev` pointers are correctly    |
+        //   |   updated to maintain list integrity.             |
+        //   | - The head pointer is reset at the end.           |
+        //   +===================================================+
+        
+        if (head == null || startIndex >= endIndex) return;
+        
+        Node dummy = new Node(0);
+        dummy.next = head;
+        head.prev = dummy;
+        
+        Node pre = dummy;
+
+        // go tho the startIndex ind
+        for(int i=0; i<startIndex; i++){
+            if (pre.next == null) {
+                head.prev = null;
+                return;
+            }
+             pre = pre.next;
+        }
+        
+        Node curr = pre.next;
+        
+        if (curr == null) {                     
+            head = dummy.next;
+            head.prev = null;
+            return;
+        }
+        
+        for(int i=0; i < endIndex - startIndex; i++){
+            Node toMove = curr.next;
+            if (toMove == null) break;
+            
+            curr.next = toMove.next;
+            if (toMove.next != null) {
+                toMove.next.prev = curr;    
+            }
+            
+            toMove.next = pre.next;
+            pre.next.prev = toMove; 
+            
+            pre.next = toMove;
+            
+            toMove.prev = pre;
+        }
+        
+        head = dummy.next;
+        head.prev = null;
+    }
+```
+## Swap Pairs
+```java
+public void swapPairs(){
+        if (head == null || head.next == null) return;
+        
+        Node preHead = new Node(0);
+        preHead.next = head;
+        head.prev = preHead;
+        
+        Node curr = head;
+        
+        while (curr != null && curr.next != null) {
+            Node first  = curr;         
+            Node second = curr.next;
+            
+            Node before = first.prev;
+            Node after  = second.next;
+            
+            // before -> second
+            if (before != null) before.next = second;
+            second.prev = before;
+            
+            // second -> first
+            second.next = first;
+            first.prev  = second;
+            
+            // first -> after
+            first.next = after;
+            if (after != null) after.prev = first;
+            
+            curr = after;
+        }
+        
+        this.head = preHead.next;
+        head.prev = null;
+    }
+```
+
