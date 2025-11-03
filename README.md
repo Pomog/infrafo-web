@@ -9,6 +9,28 @@ npm i @reduxjs/toolkit react-redux
 npm i -D prettier
 ```
 
+### look at
+```js
+var math = require('mathjs');
+
+x = [1, 2, 4];
+y = [2, 3, 5];
+
+X = math.matrix([math.ones(math.size(x)), x]);
+Y = math.matrix(y);
+
+/*
+XT = math.transpose(X);
+S  = math.multiply(X, XT)
+Xi = math.multiply(XT, math.inv(S))
+theta = math.multiply(Y, Xi);
+*/
+
+theta = math.eval("YX^T*inv(XX^T)", {X, Y});
+
+console.log(theta.toString())
+```
+
 ## Task description
 ```
 https://math.stackexchange.com/questions/31097/a-lady-and-a-monster
