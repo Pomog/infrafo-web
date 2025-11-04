@@ -273,4 +273,18 @@ public void swapPairs(){
         head.prev = null;
     }
 ```
+## reverseString
+```java
+    public static String reverseString(String str){
+        Stack<Integer> stack = new Stack<>();
+        
+        str.codePoints().forEach(stack::push);
+        
+        StringBuilder sb = new StringBuilder();
+        while (!stack.isEmpty()) {
+            sb.append((char)(int) stack.pop());
+        }
+        return sb.toString();
+    }
+```
 
