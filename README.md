@@ -9,6 +9,71 @@ npm i @reduxjs/toolkit react-redux
 npm i -D prettier
 ```
 
+### look at
+```js
+var math = require('mathjs');
+
+x = [1, 2, 4];
+y = [2, 3, 5];
+
+X = math.matrix([math.ones(math.size(x)), x]);
+Y = math.matrix(y);
+
+/*
+XT = math.transpose(X);
+S  = math.multiply(X, XT)
+Xi = math.multiply(XT, math.inv(S))
+theta = math.multiply(Y, Xi);
+*/
+
+theta = math.eval("YX^T*inv(XX^T)", {X, Y});
+
+console.log(theta.toString())
+```
+```js
+const math = require('mathjs');
+
+/**
+ * Data as COLUMN vectors (N×1)
+ * Points: (1,2), (2,3), (4,7)
+ */
+const x = math.matrix([[1], [2], [4]]);
+const y = math.matrix([[2], [3], [7]]);
+
+/**
+ * Design matrix X = [1, x, x^2]  (size N×3)
+ * - use element-wise power (dotPow), NOT matrix multiply
+ */
+const N    = x.size()[0];
+const ones = math.ones(N, 1);
+const x2   = math.dotPow(x, 2);                // element-wise square
+const X    = math.concat(ones, x, x2, 1);      // concat by columns (axis=1)
+
+/**
+ * Ordinary Least Squares via normal equations:
+ *   θ = (Xᵀ X)⁻¹ Xᵀ y
+ * Prefer solving the linear system instead of forming an explicit inverse:
+ *   (Xᵀ X) θ = Xᵀ y   →  θ = lusolve(XᵀX, Xᵀy)
+ */
+const Xt   = math.transpose(X);
+const XtX  = math.multiply(Xt, X);
+const XtY  = math.multiply(Xt, y);
+const theta = math.lusolve(XtX, XtY);          // 3×1 column: [θ0, θ1, θ2]ᵀ
+
+/**
+ * Prediction: ŷ(x0) = [1, x0, x0²] · θ
+ */
+function predict(x0) {
+  const row = math.matrix([[1, x0, x0 * x0]]); // 1×3
+  return math.multiply(row, theta).get([0, 0]);
+}
+
+// Pretty print (optional)
+console.log('X =\n',     math.format(X,     { precision: 4 }));
+console.log('theta =\n', math.format(theta, { precision: 6 }));
+console.log('y_hat(3) =', predict(3));
+```
+
 ## Task description
 ```
 https://math.stackexchange.com/questions/31097/a-lady-and-a-monster
@@ -206,6 +271,20 @@ public void swapPairs(){
         
         this.head = preHead.next;
         head.prev = null;
+    }
+```
+## reverseString
+```java
+    public static String reverseString(String str){
+        Stack<Integer> stack = new Stack<>();
+        
+        str.codePoints().forEach(stack::push);
+        
+        StringBuilder sb = new StringBuilder();
+        while (!stack.isEmpty()) {
+            sb.append((char)(int) stack.pop());
+        }
+        return sb.toString();
     }
 ```
 
