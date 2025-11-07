@@ -10,6 +10,7 @@ export type RuleContext = {
     opposite: boolean; // isOppositeThroughCenter
     dist: number;
     nearCatch: boolean;
+    cannotMatchOmega: boolean; // |ω|*r >= v_swimmer or not finite
 };
 export type StateRule = (ctx: RuleContext) => SwimmerStateName | null;
 
@@ -28,9 +29,14 @@ export const ruleLostOppositeBackToCurl: StateRule = ({current, opposite}) =>
 export const rulePreferCurlFallback: StateRule = ({current}) =>
     (current === "Curl" ? null : "Curl");
 
+export const ruleCannotMatchOmegaToCurl: StateRule =
+    ({ current, cannotMatchOmega }) =>
+        (current === "BuildGap" && cannotMatchOmega ? "Curl" : null);
+
 export const defaultRules: StateRule[] = [
     ruleDashIfOppositeAndReady,
     ruleEmergencyMoveAway,
+    ruleCannotMatchOmegaToCurl,
     ruleBuildGapIfOpposite,
     ruleLostOppositeBackToCurl,
     rulePreferCurlFallback,

@@ -17,7 +17,7 @@ export class GapState implements SwimmerState {
         const vtMatch = Math.abs(omega) * r;
 
         if (!Number.isFinite(vtMatch) || vtMatch >= this.swimmer.speed) {
-            this.swimmer.setCurrentState("Curl");
+            // cannot match omega in BuildGap
             return OK;
         }
 

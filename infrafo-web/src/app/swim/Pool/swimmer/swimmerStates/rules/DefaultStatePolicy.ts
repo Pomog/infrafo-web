@@ -18,7 +18,12 @@ export class DefaultStatePolicy implements StatePolicy {
         const dist     = swimmer.vecFrom(coach.position).len;
         const nearCatch = Number.isFinite(dist) && dist <= 2 * CATCH_EPS;
 
-        const ctx: RuleContext = { current, swimmer, coach, ratio, opposite, dist, nearCatch };
+        const { r }     = swimmer.polarState();
+        const omega     = swimmer.getCoachAngularVelocity(coach);
+        const vtMatch   = Math.abs(omega) * r;
+        const cannotMatchOmega = !(Number.isFinite(vtMatch)) || vtMatch >= swimmer.speed;
+
+        const ctx: RuleContext = { current, swimmer, coach, ratio, opposite, dist, nearCatch, cannotMatchOmega  };
 
         for (const rule of this.rules) {
             const decision = rule(ctx);
