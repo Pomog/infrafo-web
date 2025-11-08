@@ -10,8 +10,13 @@ import {StatePolicy} from "@/app/swim/Pool/swimmer/swimmerStates/rules/StatePoli
 import {DefaultStatePolicy} from "@/app/swim/Pool/swimmer/swimmerStates/rules/DefaultStatePolicy";
 import {defaultRules} from "@/app/swim/Pool/swimmer/swimmerStates/rules/policyRules";
 
+const simplePolicy = new DefaultStatePolicy(defaultRules)
+    .setLogger(e => {
+        console.debug(`[StatePolicy] ${e.from} -> ${e.to} by ${e.rule}`, e.ctx);
+    });
+
 export class SwimmerV4 extends ActorV2 {
-    private readonly states: { BuildGap: GapState; Dash: DashState; Curl: CurlState; MoveAway:  MoveAway};
+    private readonly states: { BuildGap: GapState; Dash: DashState; Curl: CurlState; MoveAway: MoveAway };
     private currentState: SwimmerState;
     private readonly policy: StatePolicy;
 
@@ -20,7 +25,7 @@ export class SwimmerV4 extends ActorV2 {
         poolRadius: number,
         poolCenter: Point,
         position: Point,
-        policy: StatePolicy = new DefaultStatePolicy(defaultRules),
+        policy: StatePolicy = simplePolicy,
     ) {
         super(speed, poolRadius, poolCenter, position);
         this.policy = policy;
@@ -52,7 +57,7 @@ export class SwimmerV4 extends ActorV2 {
     }
 
     public getCoachAngularVelocity(coach: Actor): number {
-        return this.speedOf(coach)/this.poolRadius;
+        return this.speedOf(coach) / this.poolRadius;
     };
 
     public update(coach: Actor, dt: number): StepResult {

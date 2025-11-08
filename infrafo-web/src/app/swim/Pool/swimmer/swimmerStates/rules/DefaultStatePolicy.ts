@@ -4,12 +4,30 @@ import {SwimmerV4} from "@/app/swim/Pool/swimmer/SwimmerV4";
 import {Actor} from "@/app/swim/Pool/Actor";
 import {RuleContext, StateRule} from "@/app/swim/Pool/swimmer/swimmerStates/rules/policyRules";
 
+type PolicyLogEvent = {
+    rule: string;                      // which rule fired
+    from: SwimmerStateName;            // current state before decision
+    to: SwimmerStateName | null;       // next state (null = stay)
+    ctx: Pick<RuleContext, "ratio" | "opposite" | "dist" | "nearCatch" | "cannotMatchOmega">;
+};
+
+type Logger = (e: PolicyLogEvent) => void;
+
+
 export class DefaultStatePolicy implements StatePolicy {
 
     constructor(private readonly rules: StateRule[]) {
         if (!rules || rules.length === 0) {
             throw new Error("DefaultStatePolicy: provide at least one rule");
         }
+    }
+
+    private logger?: Logger;
+
+    /** Enable or disable logging without changing constructor signature. */
+    public setLogger(logger?: Logger): this {
+        this.logger = logger;
+        return this;
     }
 
     decide(current: SwimmerStateName, swimmer: SwimmerV4, coach: Actor): SwimmerStateName | null {
@@ -25,9 +43,21 @@ export class DefaultStatePolicy implements StatePolicy {
 
         const ctx: RuleContext = { current, swimmer, coach, ratio, opposite, dist, nearCatch, cannotMatchOmega  };
 
-        for (const rule of this.rules) {
-            const decision = rule(ctx);
-            if (decision) return decision;
+        for (let i = 0; i < this.rules.length; i++) {
+            const ruleFn = this.rules[i];
+            const decision = ruleFn(ctx);
+            if (decision) {
+                if (this.logger) {
+                    const label = ruleFn.name && ruleFn.name !== "anonymous" ? ruleFn.name : `rule#${i + 1}`;
+                    this.logger({
+                        rule: label,
+                        from: current,
+                        to: decision,
+                        ctx: { ratio, opposite, dist, nearCatch, cannotMatchOmega }
+                    });
+                }
+                return decision;
+            }
         }
 
         return null;

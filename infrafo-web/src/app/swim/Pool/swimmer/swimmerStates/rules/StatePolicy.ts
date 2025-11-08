@@ -9,4 +9,3 @@ import {Actor} from "@/app/swim/Pool/Actor";
 export interface StatePolicy {
     decide(current: SwimmerStateName, swimmer: SwimmerV4, coach: Actor): SwimmerStateName | null
 }
-
