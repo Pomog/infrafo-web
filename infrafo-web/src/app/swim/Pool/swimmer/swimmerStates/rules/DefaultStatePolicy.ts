@@ -49,7 +49,7 @@ export class DefaultStatePolicy implements StatePolicy {
             if (decision) {
                 if (this.logger) {
                     const label = ruleFn.name && ruleFn.name !== "anonymous" ? ruleFn.name : `rule#${i + 1}`;
-                    this.logger({
+                    this.logger({ // ← callback
                         rule: label,
                         from: current,
                         to: decision,
@@ -61,5 +61,6 @@ export class DefaultStatePolicy implements StatePolicy {
         }
 
         return null;
+
     }
 }
