@@ -46,6 +46,9 @@ export class DefaultStatePolicy implements StatePolicy {
         for (let i = 0; i < this.rules.length; i++) {
             const ruleFn = this.rules[i];
             const decision = ruleFn(ctx);
+
+            if (!decision || decision === current) continue;
+
             if (decision) {
                 if (this.logger) {
                     const label = ruleFn.name && ruleFn.name !== "anonymous" ? ruleFn.name : `rule#${i + 1}`;

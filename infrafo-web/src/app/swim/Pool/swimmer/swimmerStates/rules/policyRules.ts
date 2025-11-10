@@ -14,14 +14,14 @@ export type RuleContext = {
 };
 export type StateRule = (ctx: RuleContext) => SwimmerStateName | null;
 
-export const ruleDashIfOppositeAndReady: StateRule = ({opposite, ratio}) =>
-    (opposite && ratio > DASH_LIMIT ? "Dash" : null);
+export const ruleDashIfOppositeAndReady: StateRule = ({current, opposite, ratio}) =>
+    (opposite && ratio > DASH_LIMIT && current !== "Dash" ? "Dash" : null);
 
-export const ruleEmergencyMoveAway: StateRule = ({nearCatch}) =>
-    (nearCatch ? "MoveAway" : null);
+export const ruleEmergencyMoveAway: StateRule = ({current, nearCatch}) =>
+    (nearCatch && current !== "MoveAway" ? "MoveAway" : null);
 
-export const ruleBuildGapIfOpposite: StateRule = ({opposite}) =>
-    (opposite ? "BuildGap" : null);
+export const ruleBuildGapIfOpposite: StateRule = ({current, opposite}) =>
+    (opposite && current !== "BuildGap" ? "BuildGap" : null);
 
 export const ruleLostOppositeBackToCurl: StateRule = ({current, opposite}) =>
     (current === "BuildGap" && !opposite ? "Curl" : null);
@@ -34,9 +34,9 @@ export const ruleCannotMatchOmegaToCurl: StateRule =
         (current === "BuildGap" && cannotMatchOmega ? "Curl" : null);
 
 export const defaultRules: StateRule[] = [
-    ruleDashIfOppositeAndReady,
     ruleEmergencyMoveAway,
     ruleCannotMatchOmegaToCurl,
+    ruleDashIfOppositeAndReady,
     ruleBuildGapIfOpposite,
     ruleLostOppositeBackToCurl,
     rulePreferCurlFallback,

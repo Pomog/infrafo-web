@@ -21,10 +21,8 @@ export class CurlState implements SwimmerState {
         // TODO: add sign - CCW CW
         const omega = this.swimmer.getCoachAngularVelocity(coach);
 
-        const vtMag = Math.abs(omega * r) * OVER_COACH;
-        if (!Number.isFinite(vtMag) || vtMag >= this.swimmer.speed) {
-            throw new Error(`CurlState: vt=${vtMag.toFixed(4)} >= v_swimmer=${this.swimmer.speed}`);
-        }
+        const vtTarget = Math.abs(omega * r) * OVER_COACH;
+        const vtMag = Math.min(Math.max(0, vtTarget), Math.max(0, this.swimmer.speed - EPS));
 
         const vrMag = Math.sqrt(this.swimmer.speed * this.swimmer.speed - vtMag * vtMag);
 
