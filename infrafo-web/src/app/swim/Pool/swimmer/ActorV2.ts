@@ -103,6 +103,8 @@ export abstract class ActorV2 {
         return r / this.poolRadius;
     }
 
+    public distanceFromCenter
+
     public radialUnitFromCenter(): UnitVector {
         const rx = this.pos.x - this.poolCenter.x;
         const ry = this.pos.y - this.poolCenter.y;
