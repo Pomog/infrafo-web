@@ -1,4 +1,4 @@
-import {ANG_DEAD, ANG_EPS, CATCH_EPS, Delta, MIN_LEN, Point, StepResult, UnitVector} from "@/app/swim/Pool/Types";
+import {ANG_DEAD, CATCH_EPS, Delta, MIN_LEN, Point, StepResult, UnitVector} from "@/app/swim/Pool/Types";
 import {Actor} from "@/app/swim/Pool/Actor";
 
 export abstract class ActorV2 {
@@ -11,14 +11,16 @@ export abstract class ActorV2 {
         position: Point,
     ) {
         this.pos = {...position};
-        this.poolCenter = { ...poolCenter }
+        this.poolCenter = {...poolCenter}
     }
 
     get position(): Readonly<Point> {
         return this.pos;
     }
 
-    set position(p: Readonly<Point>) { this.setPosition(p); }
+    set position(p: Readonly<Point>) {
+        this.setPosition(p);
+    }
 
     setPosition(p: Readonly<Point>): void {
         this.pos.x = p.x;
@@ -53,7 +55,7 @@ export abstract class ActorV2 {
     };
 
     public getPoolCenter(): Readonly<Point> {
-        return { x: this.poolCenter.x, y: this.poolCenter.y };
+        return {x: this.poolCenter.x, y: this.poolCenter.y};
     }
 
     public getPoolRadius(): number {
@@ -81,9 +83,8 @@ export abstract class ActorV2 {
         return this.distanceToActor(other) <= eps;
     }
 
-    protected isFled(){
-        const lenFromCenter = this.vecFrom(this.poolCenter);
-        return this.poolRadius < lenFromCenter.len;
+    protected isFled() {
+        return this.poolRadius < this.distanceFromCenter();
     }
 
     getUnitVectorFrom = (position: Readonly<Point>): UnitVector => {
@@ -93,29 +94,30 @@ export abstract class ActorV2 {
             throw new Error("getUnitVectorFrom: coincident points (cannot define direction)");
         }
 
-        return { ux: delta.dx / delta.len, uy: delta.dy / delta.len };
+        return {ux: delta.dx / delta.len, uy: delta.dy / delta.len};
     };
 
     public normalizedDistanceFromCenter(): number {
-        const rx = this.pos.x - this.poolCenter.x;
-        const ry = this.pos.y - this.poolCenter.y;
-        const r  = Math.hypot(rx, ry);
-        return r / this.poolRadius;
+        return this.distanceFromCenter() / this.poolRadius;
     }
 
-    public distanceFromCenter
+    public distanceFromCenter(): number {
+        const rx = this.pos.x - this.poolCenter.x;
+        const ry = this.pos.y - this.poolCenter.y;
+        return Math.hypot(rx, ry);
+    }
 
     public radialUnitFromCenter(): UnitVector {
         const rx = this.pos.x - this.poolCenter.x;
         const ry = this.pos.y - this.poolCenter.y;
-        const r  = Math.hypot(rx, ry);
+        const r = Math.hypot(rx, ry);
         const EPS = MIN_LEN;
 
         if (!Number.isFinite(r) || r <= EPS) {
             throw new Error("radialUnitFromCenter: actor at/near center; direction undefined");
         }
 
-        return { ux: rx / r, uy: ry / r };
+        return {ux: rx / r, uy: ry / r};
     }
 
     private angDiffRad(a: number, b: number): number {
@@ -151,7 +153,7 @@ export abstract class ActorV2 {
         const ckux = ckx / ckLen, ckuy = cky / ckLen; // unit(center->other)
 
         // For unit vectors: dot = cos(Δθ), cross(z) = sin(Δθ)
-        const dot   = csux * ckux + csuy * ckuy;        // cos(Δθ)
+        const dot = csux * ckux + csuy * ckuy;        // cos(Δθ)
         const cross = csux * ckuy - csuy * ckux;        // sin(Δθ)
 
         // Opposite sides ≈ angle = π: |sin| small and cos -1
