@@ -84,7 +84,9 @@ export abstract class ActorV2 {
     }
 
     protected isFled() {
-        return (this.poolRadius - this.distanceFromCenter()) <= MIN_LEN;
+        // eps protects is the radius is large
+        const eps = Math.max(MIN_LEN, MIN_LEN * this.poolRadius);
+        return (this.poolRadius - this.distanceFromCenter()) <= eps;
     }
 
     getUnitVectorFrom = (position: Readonly<Point>): UnitVector => {
