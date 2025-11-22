@@ -1,6 +1,6 @@
 import {ActorV2} from "@/app/swim/Pool/swimmer/ActorV2";
 import {Actor} from "@/app/swim/Pool/Actor";
-import {CAUGHT, OK, StepResult, UnitVector} from "@/app/swim/Pool/Types";
+import {CATCH_EPS, CAUGHT, OK, Point, StepResult, UnitVector} from "@/app/swim/Pool/Types";
 
 /**
  * Convention:
@@ -11,6 +11,9 @@ import {CAUGHT, OK, StepResult, UnitVector} from "@/app/swim/Pool/Types";
  */
 export class CoachV4 extends ActorV2 {
     /** +1 = CCW, -1 = CW */
+
+    private lastSpin: -1 | 1 = 1;
+
     constructor(
         speed: number,
         poolRadius: number,
@@ -26,12 +29,42 @@ export class CoachV4 extends ActorV2 {
         return { ux: -vr.uy, uy: vr.ux };
     }
 
+    private chooseDirCCW(target: Point): -1 | 0 | 1 {
+        const center= this.getPoolCenter();
+        const R= this.getPoolRadius();
+
+        const rx = this.position.x - center.x;
+        const ry = this.position.y - center.y;
+        const rl = Math.hypot(rx, ry);
+        if (rl <= CATCH_EPS) return 0;
+
+        const rux = rx / rl, ruy = ry / rl;
+
+        // CCW tangent
+        const tccw_x = -ruy, tccw_y = rux;
+
+        // swimmer - coach
+        const tsx = target.x - this.position.x;
+        const tsy = target.y - this.position.y;
+
+
+        return this.lastSpin;
+    }
+
+    /**
+     * signed angular velocity
+     * ω = lastSpin * v / r
+     */
     public getSignedAngularVelocity(): number {
-        const r = this.vecFrom(this.getPoolCenter()).len;
-        return (r > 0) ? this.dir * (this.speed / r) : 0;
+        const center = this.getPoolCenter();
+        const rx = this.position.x - center.x;
+        const ry = this.position.y - center.y;
+        const r  = Math.hypot(rx, ry);
+        return r > 0 ? this.lastSpin * (this.speed / r) : 0;
     }
     update(opponent: Actor, dt: number): StepResult {
-        // BEFORE moving сheck isCaught
+        // BEFORE moving check isCaught
+        if (this.isCaught(opponent)) return CAUGHT;
 
         // decide direction along the rim: +1 = CCW, -1 = CW, 0 = stay
 
