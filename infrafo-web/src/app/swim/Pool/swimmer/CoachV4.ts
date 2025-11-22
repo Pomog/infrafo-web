@@ -17,8 +17,8 @@ export class CoachV4 extends ActorV2 {
     constructor(
         speed: number,
         poolRadius: number,
-        poolCenter: {x:number;y:number},
-        position: {x:number;y:number},
+        poolCenter: { x: number; y: number },
+        position: { x: number; y: number },
     ) {
         super(speed, poolRadius, poolCenter, position);
     }
@@ -26,28 +26,40 @@ export class CoachV4 extends ActorV2 {
     /** Rotate the radial vector by +90° */
     private tangentCCW(): UnitVector {
         const vr = this.radialUnitFromCenter();
-        return { ux: -vr.uy, uy: vr.ux };
+        return {ux: -vr.uy, uy: vr.ux};
     }
 
+    /**
+     * +1 — move CCW (increase angle),
+     * -1 — move CW (decrease angle),
+     * 0 — stop if moving along the arc doesn't improve anything.
+     */
     private chooseDirCCW(target: Point): -1 | 0 | 1 {
-        const center= this.getPoolCenter();
-        const R= this.getPoolRadius();
+        const O = this.getPoolCenter();
+        const R = this.getPoolRadius();
 
-        const rx = this.position.x - center.x;
-        const ry = this.position.y - center.y;
-        const rl = Math.hypot(rx, ry);
-        if (rl <= CATCH_EPS) return 0;
+        // radial vector
+        const rx = this.position.x - O.x;
+        const ry = this.position.y - O.y;
 
-        const rux = rx / rl, ruy = ry / rl;
+        // CCW tangent (radial unit vector turn π/2)
+        const tccw_x = -ry, tccw_y = rx;
 
-        // CCW tangent
-        const tccw_x = -ruy, tccw_y = rux;
-
-        // swimmer - coach
+        // swimmer-coach vector
         const tsx = target.x - this.position.x;
         const tsy = target.y - this.position.y;
 
+        const dot = tccw_x * tsx + tccw_y * tsy;
 
+        if (Math.abs(dot) > CATCH_EPS) {
+            const s: -1 | 1 = dot > 0 ? 1 : -1; // dot>0 → CCW, dot<0 → CW
+            this.lastSpin = s;
+            return s;
+        }
+
+        // Collinearity case: compare the radius and swimmer-coach dist
+        const distCS = Math.hypot(this.position.x - target.x, this.position.y - target.y);
+        if (distCS < R - CATCH_EPS) return 0;
         return this.lastSpin;
     }
 
@@ -59,9 +71,10 @@ export class CoachV4 extends ActorV2 {
         const center = this.getPoolCenter();
         const rx = this.position.x - center.x;
         const ry = this.position.y - center.y;
-        const r  = Math.hypot(rx, ry);
+        const r = Math.hypot(rx, ry);
         return r > 0 ? this.lastSpin * (this.speed / r) : 0;
     }
+
     update(opponent: Actor, dt: number): StepResult {
         // BEFORE moving check isCaught
         if (this.isCaught(opponent)) return CAUGHT;
