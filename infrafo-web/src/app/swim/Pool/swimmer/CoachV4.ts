@@ -69,10 +69,8 @@ export class CoachV4 extends ActorV2 {
      */
     public getSignedAngularVelocity(): number {
         const center = this.getPoolCenter();
-        const rx = this.position.x - center.x;
-        const ry = this.position.y - center.y;
-        const r = Math.hypot(rx, ry);
-        return r > 0 ? this.lastSpin * (this.speed / r) : 0;
+        const r = Math.hypot(this.position.x - center.x, this.position.y - center.y);
+        return r > 0 ? this.currentSpin * (this.speed / r) : 0;
     }
 
     update(opponent: Actor, dt: number): StepResult {
