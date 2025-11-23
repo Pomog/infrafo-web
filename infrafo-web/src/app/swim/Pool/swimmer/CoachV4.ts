@@ -4,15 +4,16 @@ import {CATCH_EPS, CAUGHT, OK, Point, StepResult, UnitVector} from "@/app/swim/P
 
 /**
  * Convention:
- * vr - form center
- * vt - tangent CWW
+ * vr — from center (radial, outward)
+ * vt — tangent CCW (rot90(vr))
  * ω > 0 = CCW; ω < 0 = CW
- * tangent = (ω>=0 ? vt : -vt)
+ * tangent = (ω >= 0 ? +vt : -vt)
  */
 export class CoachV4 extends ActorV2 {
     /** +1 = CCW, -1 = CW */
 
-    private lastSpin: -1 | 1 = 1;
+    private currentSpin: -1 | 0 | 1 = 0;
+    private lastOmega = 0;
 
     constructor(
         speed: number,
@@ -42,7 +43,7 @@ export class CoachV4 extends ActorV2 {
         const rx = this.position.x - O.x;
         const ry = this.position.y - O.y;
 
-        // CCW tangent (radial unit vector turn π/2)
+        // CCW tangent (radial vector rotated π/2)
         const tccw_x = -ry, tccw_y = rx;
 
         // swimmer-coach vector
@@ -51,16 +52,16 @@ export class CoachV4 extends ActorV2 {
 
         const dot = tccw_x * tsx + tccw_y * tsy;
 
-        if (Math.abs(dot) > CATCH_EPS) {
+        if (Math.abs(Math.sqrt(dot)) > CATCH_EPS) {
             const s: -1 | 1 = dot > 0 ? 1 : -1; // dot>0 → CCW, dot<0 → CW
-            this.lastSpin = s;
+            this.currentSpin = s;
             return s;
         }
 
         // Collinearity case: compare the radius and swimmer-coach dist
         const distCS = Math.hypot(this.position.x - target.x, this.position.y - target.y);
         if (distCS < R - CATCH_EPS) return 0;
-        return this.lastSpin;
+        return this.currentSpin;
     }
 
     /**
@@ -78,16 +79,34 @@ export class CoachV4 extends ActorV2 {
         if (this.isCaught(opponent)) return CAUGHT;
 
         // decide direction along the rim: +1 = CCW, -1 = CW, 0 = stay
+        const dir = this.chooseDirCCW(opponent.position);
+        if (dir === 0) return OK;
 
         // Angular step: ΔA = (v*dt)/R, signed by dir
+        const dA = (dir * this.speed * dt) / R;
 
         // Current radial vector (center -> coach)
+        const O = this.getPoolCenter();
+        const R = this.getPoolRadius();
+        const dx = this.position.x - O.x;
+        const dy = this.position.y - O.y;
+        const rl = Math.hypot(dx, dy);
+        if (!(rl > 0)) return OK;
 
         // Scale radial vector to exact radius (remove drift)
+        const rx = (dx * R) / rl;
+        const ry = (dy * R) / rl;
 
         // Rotate by ΔA (strictly along arc)
+        const c = Math.cos(dA), s = Math.sin(dA);
+        const nx = rx * c - ry * s;
+        const ny = rx * s + ry * c;
 
         // New position on the circle
+        this.setPosition({ x: O.x + nx, y: O.y + ny });
+
+        // remember last non-zero spin for tie-breaks
+        this.currentSpin = dir;
 
         // AFTER moving
         if (this.isCaught(opponent)) return CAUGHT;
