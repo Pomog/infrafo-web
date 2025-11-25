@@ -288,3 +288,30 @@ public void swapPairs(){
     }
 ```
 
+## Sort Stack 
+```java
+    public static void sortStack(Stack<Integer> s) {
+
+        Stack<Integer> newStack = new Stack<>();
+        
+        int temp;
+        
+        while(!s.isEmpty()){
+            temp = s.pop();
+            
+            if(newStack.isEmpty() || newStack.peek() <= temp){
+                newStack.push(temp);
+            } else {
+                while(!newStack.isEmpty() && newStack.peek() > temp){
+                    s.push(newStack.pop());
+                };
+                newStack.push(temp);
+            };
+        }
+        
+        while(!newStack.isEmpty()){
+           s.push(newStack.pop()); 
+        }
+    };
+```
+
